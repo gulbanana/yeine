@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Yeine.Strategies;
 
 namespace Yeine
 {
@@ -9,7 +10,7 @@ namespace Yeine
         {
             using (var reader = new StreamReader(Console.OpenStandardInput(512)))
             {
-                Runner game = new Runner(reader, Console.Out, new Strategy());
+                Runner game = new Runner(reader, Console.Out, new Strategies.AlwaysPass());
                 game.Run();
             }
         }

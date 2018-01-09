@@ -9,11 +9,11 @@ namespace Yeine
     {
         private readonly TextReader input;
         private readonly TextWriter output;
-        private readonly Strategy strategy;
+        private readonly IStrategy strategy;
         private readonly Game state;
         private readonly Parser parser;
 
-        public Runner(TextReader input, TextWriter output, Strategy strategy)
+        public Runner(TextReader input, TextWriter output, IStrategy strategy)
         {
             this.input = input;
             this.output = output;
@@ -50,7 +50,7 @@ namespace Yeine
                     case "action":
                         if (parts[1].Equals("move"))
                         {
-                            var move = strategy.DoMove(state);
+                            var move = strategy.Act(state);
                             output.WriteLine(move?.ToString() ?? MoveType.Pass.ToString());
                         }
                         break;

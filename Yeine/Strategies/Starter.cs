@@ -4,18 +4,23 @@ using System.Linq;
 using Yeine.API;
 using Yeine.State;
 
-namespace Yeine
+namespace Yeine.Strategies
 {
-    public class Strategy
+    /// <summary>Adapted from Riddles.io sample code</summary>
+    class Starter : IStrategy
     {
         private Random Random;
 
-        public Strategy()
+        public Starter()
         {
             Random = new Random();
         }
 
-        public Move DoMove(Game state)
+        /**
+         * Performs a Birth or a Kill move, currently returns a random move.
+         * Implement this to make the bot smarter.
+         */
+        public Move Act(Game state)
         {
             var cellMap = state.Field.GetCellMapping();
 

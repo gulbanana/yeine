@@ -27,10 +27,10 @@ action move 10000";
         {
             var reader = new StringReader(script);
             var writer = new StringWriter();
-            Runner runner = new Runner(reader, writer, new Strategy());
+            Runner runner = new Runner(reader, writer, new Strategies.AlwaysPass());
             runner.Run();
 
-            Assert.Single(writer.ToString().Where(c => c == '\n'));
+            Assert.Equal("Pass" + Environment.NewLine, writer.ToString());
         }
     }
 }
