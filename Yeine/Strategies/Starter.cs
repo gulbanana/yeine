@@ -7,7 +7,7 @@ using Yeine.State;
 namespace Yeine.Strategies
 {
     /// <summary>Adapted from Riddles.io sample code</summary>
-    class Starter : IStrategy
+    public class Starter : IStrategy
     {
         private Random Random;
 
@@ -22,9 +22,9 @@ namespace Yeine.Strategies
          */
         public Move Act(Game state)
         {
-            var cellMap = state.Field.GetCellMapping();
+            var cellMap = CreateMap(state);
 
-            if (Random.NextDouble() < 0.5)
+            if (Random.NextDouble() < 0.5 && cellMap[state.MyID].Count > 1)
             {
                 return DoRandomBirthMove(state, cellMap);
             }
@@ -40,7 +40,7 @@ namespace Yeine.Strategies
          */
         private Move DoRandomBirthMove(Game state, Dictionary<string, List<Point>> cellMap)
         {
-            var myId = state.Field.MyID;
+            var myId = state.MyID;
             var deadCells = cellMap["."];
             var myCells = new List<Point>(cellMap[myId]);
 
@@ -68,8 +68,8 @@ namespace Yeine.Strategies
          */
         private Move DoRandomKillMove(Game state, Dictionary<string, List<Point>> cellMap)
         {
-            var myId = state.Field.MyID;
-            var opponentId = state.Field.OpponentID;
+            var myId = state.MyID;
+            var opponentId = state.TheirID;
             var livingCells = cellMap[myId].Concat(cellMap[opponentId]).ToList();
 
             if (livingCells.Count <= 0)
@@ -80,6 +80,28 @@ namespace Yeine.Strategies
             var randomLiving = livingCells[Random.Next(livingCells.Count)];
 
             return Move.Kill(randomLiving);
+        }
+
+        private Dictionary<string, List<Point>> CreateMap(Game state)
+        {
+            var cellMap = new Dictionary<string, List<Point>>()
+            {
+                {".", new List<Point>()},
+                {"0", new List<Point>()},
+                {"1", new List<Point>()},
+            };
+
+            for (int x = 0; x < state.FieldWidth; x++)
+            {
+                for (int y = 0; y < state.FieldHeight; y++)
+                {
+                    string cell = state.Cells[x,y];
+
+                    cellMap[cell].Add(new Point(x, y));
+                }
+            }
+
+            return cellMap;
         }
     }
 }

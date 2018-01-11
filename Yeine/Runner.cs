@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using Yeine.API;
 using Yeine.State;
@@ -12,6 +13,7 @@ namespace Yeine
         private readonly IStrategy strategy;
         private readonly Game state;
         private readonly Parser parser;
+        private readonly Stopwatch timer;
 
         public Runner(TextReader input, TextWriter output, IStrategy strategy)
         {
@@ -20,6 +22,7 @@ namespace Yeine
             this.strategy = strategy;
             this.state = new Game();
             this.parser = new Parser(state);
+            this.timer = new Stopwatch();
         }
 
         public void Run()
@@ -28,36 +31,20 @@ namespace Yeine
 
             while ((line = input.ReadLine()) != null)
             {
-                var parts = line.Split(' ');
+                var timeout = parser.Command(line);
+                if (timeout.HasValue)
+                {                  
+                    state.CurrentTimebank = timeout.Value;
 
-                switch (parts[0])
-                {
-                    case "settings":
-                        parser.Settings(parts[1], parts[2]);
-                        break;
+                    state.Log($"begin turn, {timeout}ms available");
+                    timer.Restart();
 
-                    case "update":
-                        if (parts[1].Equals("game"))
-                        {
-                            parser.UpdateGame(parts[2], parts[3]);
-                        }
-                        else
-                        {
-                            parser.UpdatePlayer(parts[1], parts[2], parts[3]);
-                        }
-                        break;
+                    var move = strategy.Act(state);
 
-                    case "action":
-                        if (parts[1].Equals("move"))
-                        {
-                            var move = strategy.Act(state);
-                            output.WriteLine(move?.ToString() ?? MoveType.Pass.ToString());
-                        }
-                        break;
+                    timer.Stop();
+                    state.Log($"end turn, {timer.ElapsedMilliseconds}ms used");
 
-                    default:
-                        Console.Error.WriteLine("Unknown command");
-                        break;
+                    output.WriteLine(move);
                 }
             }
         }

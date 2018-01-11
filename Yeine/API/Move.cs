@@ -5,12 +5,12 @@ namespace Yeine.API
 {
     public class Move
     {
-        private readonly MoveType command;
+        public readonly MoveType Command;
         private readonly Point[] arguments;
 
         private Move(MoveType type, params Point[] points) 
         {
-            this.command = type;
+            this.Command = type;
             this.arguments = points;
         }
 
@@ -23,7 +23,7 @@ namespace Yeine.API
         public override string ToString() 
         {
             StringBuilder builder = new StringBuilder();
-            builder.Append(command.ToString());
+            builder.Append(Command.ToString());
             
             for (var i = 0; i < arguments.Length; i++)
             {

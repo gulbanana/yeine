@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Yeine.Test
 {
-    public class IntegrationTest
+    public class IntegrationTests
     {
         private const string script = 
 @"settings timebank 10000
@@ -23,14 +23,14 @@ update player1 living_cells 50
 action move 10000";
 
         [Fact]
-        public void OneMove()
+        public void OneMoveGame()
         {
             var reader = new StringReader(script);
             var writer = new StringWriter();
-            Runner runner = new Runner(reader, writer, new Strategies.AlwaysPass());
+            var runner = new Runner(reader, writer, new Strategies.AlwaysPass());
             runner.Run();
 
-            Assert.Equal("Pass" + Environment.NewLine, writer.ToString());
+            Assert.NotStrictEqual("pass" + Environment.NewLine, writer.ToString());
         }
     }
 }

@@ -8,9 +8,9 @@ namespace Yeine
     {
         static void Main(string[] args)
         {
-            using (var reader = new StreamReader(Console.OpenStandardInput(512)))
+            using (var wideIn = new StreamReader(Console.OpenStandardInput(512)))
             {
-                Runner game = new Runner(reader, Console.Out, new Strategies.AlwaysPass());
+                Runner game = new Runner(wideIn, Console.Out, new Strategies.AlwaysPass());
                 game.Run();
             }
         }

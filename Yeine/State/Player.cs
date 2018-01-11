@@ -2,13 +2,15 @@ namespace Yeine.State
 {
     public class Player
     {
-        public string Name { get; private set; }
+        public int ID { get; }
+        public string Name { get; set; }
         public int LivingCells { get; set; }
-        public string previousMove { get; set; }
+        public string LastMove { get; set; }
 
-        public Player(string playerName)
+        public Player(int id)
         {
-            Name = playerName;
+            ID = id;
+            Name = $"player{id}";
         }
     }
 }
