@@ -21,7 +21,7 @@ namespace Yeine.Strategies
         {
             var cellMap = CreateMap(state);
 
-            if (Random.NextDouble() < 0.5 && cellMap[state.MyID].Count > 1)
+            if (Random.NextDouble() < 0.5 && cellMap[state.OurID].Count > 1)
             {
                 return DoRandomBirthMove(state, cellMap);
             }
@@ -34,7 +34,7 @@ namespace Yeine.Strategies
         /// <summary>Selects one dead cell and two of own living cells a random to birth a new cell on at the point of the dead cell</summary>
         private Move DoRandomBirthMove(Game state, Dictionary<char, List<Point>> cellMap)
         {
-            var myId = state.MyID;
+            var myId = state.OurID;
             var deadCells = cellMap['.'];
             var myCells = new List<Point>(cellMap[myId]);
 
@@ -60,7 +60,7 @@ namespace Yeine.Strategies
         /// <summary>Selects one random living cell on the field and kills it</summary>
         private Move DoRandomKillMove(Game state, Dictionary<char, List<Point>> cellMap)
         {
-            var myId = state.MyID;
+            var myId = state.OurID;
             var opponentId = state.TheirID;
             var livingCells = cellMap[myId].Concat(cellMap[opponentId]).ToList();
 

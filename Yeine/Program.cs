@@ -10,7 +10,7 @@ namespace Yeine
         {
             using (var wideIn = new StreamReader(Console.OpenStandardInput(512)))
             {
-                Runner game = new Runner(wideIn, Console.Out, new Strategies.AlwaysPass());
+                Runner game = new Runner(wideIn, Console.Out, new Strategies.KillBest());
                 game.Run();
             }
         }

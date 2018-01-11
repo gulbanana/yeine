@@ -9,8 +9,8 @@ namespace Yeine.State
         public int MaxTimebank { get; set; } = 10000;
         public int TimePerMove { get; set; } = 100;
         public int MaxRounds { get; set; } = 100;
-        public string MyName { get; set; } = "player0";
-        public char MyID { get; set; } = '0';
+        public string OurName { get; set; } = "player0";
+        public char OurID { get; set; } = '0';
         public char TheirID { get; set; }  = '1';
 
         // current game state
@@ -29,41 +29,12 @@ namespace Yeine.State
 
         public void Log(string text)
         {
-            Console.Error.WriteLine($"{MyName} T{RoundNumber}: {text}");
+            Console.Error.WriteLine($"{OurName} T{RoundNumber}: {text}");
         }
 
         public void ParseField(int width, int height, string input)
         {
-            var cells = new char[width, height];
-            var x = 0;
-            var y = 0;
-
-            Player0.LivingCells = 0;
-            Player1.LivingCells = 0;
-            foreach (string cell in input.Split(','))
-            {
-                var cellData = cell[0];
-                cells[x,y] = cellData;
-
-                switch (cellData)
-                {
-                    case '0':
-                        Player0.LivingCells++;
-                        break;
-
-                    case '1':
-                        Player1.LivingCells++;
-                        break;
-                }
-
-                if (++x == width)
-                {
-                    x = 0;
-                    y++;
-                }
-            }
-
-            Field = new Field(width, height, cells);
+            Field = new Field(width, height, input, out Player0.LivingCells, out Player1.LivingCells);
         }
     }
 }

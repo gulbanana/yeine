@@ -8,6 +8,7 @@ namespace Yeine.Strategies
     {
         public Move Act(Game state)
         {
+            var baseValue = state.Field.CalculateValue(state.OurID, state.TheirID);
             var bestValue = 0;
             var bestTarget = default(Point);
 
@@ -17,9 +18,12 @@ namespace Yeine.Strategies
                 {
                     if (state.Field.Cells[x,y] != '.')
                     {
-                        var value = -1; // XXX clone and run sim
-                        if (value > bestValue)
+                        var simField = state.Field.Clone();
+                        var simValue = simField.CalculateValue(state.OurID, state.TheirID) - baseValue;
+
+                        if (simValue > bestValue)
                         {
+                            bestValue = simValue;
                             bestTarget = new Point(x, y);
                         }
                     }

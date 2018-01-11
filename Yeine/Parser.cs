@@ -67,11 +67,11 @@ namespace Yeine
                     break;
 
                 case "your_bot":
-                    state.MyName = value;
+                    state.OurName = value;
                     break;
 
                 case "your_botid":
-                    state.MyID = value[0];
+                    state.OurID = value[0];
                     state.TheirID = (2 - (int.Parse(value) + 1)).ToString()[0];
                     break;
 

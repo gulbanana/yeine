@@ -2,10 +2,10 @@ namespace Yeine.State
 {
     public class Player
     {
-        public int ID { get; }
-        public string Name { get; set; }
-        public int LivingCells { get; set; }
-        public string LastMove { get; set; }
+        public readonly int ID;
+        public string Name;
+        public int LivingCells;
+        public string LastMove;
 
         public Player(int id)
         {
