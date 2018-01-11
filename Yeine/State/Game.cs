@@ -10,15 +10,11 @@ namespace Yeine.State
         public int TimePerMove { get; set; } = 100;
         public int MaxRounds { get; set; } = 100;
         public string MyName { get; set; } = "player0";
-        public string MyID { get; set; } = "0";
-        public string TheirID { get; set; }  = "1";
+        public char MyID { get; set; } = '0';
+        public char TheirID { get; set; }  = '1';
 
-        // field state
-        public int FieldWidth { get; set; } = 0;
-        public int FieldHeight { get; set; } = 0;
-        public string[,] Cells { get; private set; } = new string[0,0];
-
-        // current round state
+        // current game state
+        public Field Field { get; private set; }
         public Player Player0 { get; }
         public Player Player1 { get; }
         public int RoundNumber { get; set; }
@@ -26,6 +22,7 @@ namespace Yeine.State
 
         public Game()
         {
+            Field = new Field(0, 0, new char[0,0]);
             Player0 = new Player(0);
             Player1 = new Player(1);
         }
@@ -37,14 +34,7 @@ namespace Yeine.State
 
         public void ParseField(int width, int height, string input)
         {
-            FieldWidth = width;
-            FieldHeight = height;
-            ParseField(input);
-        }
-
-        public void ParseField(string input)
-        {
-            Cells = new string[FieldWidth, FieldHeight];
+            var cells = new char[width, height];
             var x = 0;
             var y = 0;
 
@@ -52,25 +42,28 @@ namespace Yeine.State
             Player1.LivingCells = 0;
             foreach (string cell in input.Split(','))
             {
-                Cells[x,y] = cell;
+                var cellData = cell[0];
+                cells[x,y] = cellData;
 
-                switch (cell)
+                switch (cellData)
                 {
-                    case "0":
+                    case '0':
                         Player0.LivingCells++;
                         break;
 
-                    case "1":
+                    case '1':
                         Player1.LivingCells++;
                         break;
                 }
 
-                if (++x == FieldWidth)
+                if (++x == width)
                 {
                     x = 0;
                     y++;
                 }
             }
+
+            Field = new Field(width, height, cells);
         }
     }
 }

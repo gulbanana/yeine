@@ -6,7 +6,7 @@ using Yeine.State;
 
 namespace Yeine.Strategies
 {
-    /// <summary>Adapted from Riddles.io sample code</summary>
+    /// <summary>Adapted from Riddles.io sample code as a control</summary>
     public class Starter : IStrategy
     {
         private Random Random;
@@ -16,10 +16,7 @@ namespace Yeine.Strategies
             Random = new Random();
         }
 
-        /**
-         * Performs a Birth or a Kill move, currently returns a random move.
-         * Implement this to make the bot smarter.
-         */
+        /// <summary>Performs a random Birth or Kill move (if possible)</summary>
         public Move Act(Game state)
         {
             var cellMap = CreateMap(state);
@@ -34,14 +31,11 @@ namespace Yeine.Strategies
             }
         }
 
-        /**
-         * Selects one dead cell and two of own living cells a random to birth a new cell
-         * on at the point of the dead cell
-         */
-        private Move DoRandomBirthMove(Game state, Dictionary<string, List<Point>> cellMap)
+        /// <summary>Selects one dead cell and two of own living cells a random to birth a new cell on at the point of the dead cell</summary>
+        private Move DoRandomBirthMove(Game state, Dictionary<char, List<Point>> cellMap)
         {
             var myId = state.MyID;
-            var deadCells = cellMap["."];
+            var deadCells = cellMap['.'];
             var myCells = new List<Point>(cellMap[myId]);
 
             if (deadCells.Count <= 0 || myCells.Count < 2)
@@ -63,10 +57,8 @@ namespace Yeine.Strategies
             return Move.Birth(randomBirth, sacrificePoints[0], sacrificePoints[1]);
         }
 
-        /**
-         * Selects one random living cell on the field and kills it
-         */
-        private Move DoRandomKillMove(Game state, Dictionary<string, List<Point>> cellMap)
+        /// <summary>Selects one random living cell on the field and kills it</summary>
+        private Move DoRandomKillMove(Game state, Dictionary<char, List<Point>> cellMap)
         {
             var myId = state.MyID;
             var opponentId = state.TheirID;
@@ -82,20 +74,20 @@ namespace Yeine.Strategies
             return Move.Kill(randomLiving);
         }
 
-        private Dictionary<string, List<Point>> CreateMap(Game state)
+        private Dictionary<char, List<Point>> CreateMap(Game state)
         {
-            var cellMap = new Dictionary<string, List<Point>>()
+            var cellMap = new Dictionary<char, List<Point>>()
             {
-                {".", new List<Point>()},
-                {"0", new List<Point>()},
-                {"1", new List<Point>()},
+                {'.', new List<Point>()},
+                {'0', new List<Point>()},
+                {'1', new List<Point>()},
             };
 
-            for (int x = 0; x < state.FieldWidth; x++)
+            for (int x = 0; x < state.Field.Width; x++)
             {
-                for (int y = 0; y < state.FieldHeight; y++)
+                for (int y = 0; y < state.Field.Height; y++)
                 {
-                    string cell = state.Cells[x,y];
+                    var cell = state.Field.Cells[x,y];
 
                     cellMap[cell].Add(new Point(x, y));
                 }

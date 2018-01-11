@@ -47,5 +47,12 @@ namespace Yeine.Test
 
             Assert.Equal(MoveType.Pass, move.Command);
         }
+
+        [Fact]
+        public void KillBest_DoesntCrash()
+        {
+            var strat = new KillBest();
+            var move = strat.Act(state);
+        }
     }
 }

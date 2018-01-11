@@ -7,7 +7,9 @@ namespace Yeine
     public class Parser
     {
         private readonly Game state;
-        
+        private int buildWidth;
+        private int buildHeight;
+
         public Parser(Game state)
         {
             this.state = state;
@@ -69,16 +71,16 @@ namespace Yeine
                     break;
 
                 case "your_botid":
-                    state.MyID = value;
-                    state.TheirID = (2 - (int.Parse(value) + 1)) + "";
+                    state.MyID = value[0];
+                    state.TheirID = (2 - (int.Parse(value) + 1)).ToString()[0];
                     break;
 
                 case "field_width":
-                    state.FieldWidth = int.Parse(value);
+                    buildWidth = int.Parse(value);
                     break;
 
                 case "field_height":
-                    state.FieldHeight = int.Parse(value);
+                    buildHeight = int.Parse(value);
                     break;
 
                 case "max_rounds":
@@ -100,7 +102,7 @@ namespace Yeine
                     break;
 
                 case "field":
-                    state.ParseField(value);
+                    state.ParseField(buildWidth, buildHeight, value);
                     break;
 
                 default:
