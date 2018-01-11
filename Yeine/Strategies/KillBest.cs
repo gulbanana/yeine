@@ -14,7 +14,7 @@ namespace Yeine.Strategies
 
             for (var x = 0; x < state.Field.Width; x++)
             {
-                for (var y = 0; x < state.Field.Height; y++)
+                for (var y = 0; y < state.Field.Height; y++)
                 {
                     if (state.Field.Cells[x,y] != '.')
                     {
@@ -22,7 +22,7 @@ namespace Yeine.Strategies
                         
                         simField.Cells[x,y] = '.';
                         simField.UpdatePosition();
-                        
+
                         var simValue = simField.CalculatePositionValue(state.OurID, state.TheirID) - baseValue;
 
                         if (simValue > bestValue)
