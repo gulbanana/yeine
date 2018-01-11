@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 
 namespace Yeine.State
 {
@@ -74,7 +75,7 @@ namespace Yeine.State
             return new Field(Width, Height, (char[,])Cells.Clone());
         }
 
-        public int CalculateValue(char us, char them)
+        public int CalculatePositionValue(char us, char them)
         {
             var ours = 0;
             var theirs = 0;
@@ -95,6 +96,102 @@ namespace Yeine.State
             }
 
             return ours - theirs;
+        }
+
+        public void UpdatePosition()
+        {
+            var neighbours = new int[Width, Height];
+
+            // pass 1: count neighbours
+            for (var x = 0; x < Width; x++)
+            {
+                for (var y = 0; y < Height; y++)
+                {
+                    if (Cells[x,y] != '.')
+                    {
+                        if (x > 0 && y > 0) neighbours[x-1, y-1]++;
+                        if (y > 0) neighbours[x, y-1]++;
+                        if (x < Width-1 && y > 0) neighbours[x+1, y-1]++;
+
+                        if (x > 0) neighbours[x-1, y]++;
+                        if (x < Width-1) neighbours[x+1, y]++;
+
+                        if (x > 0 && y < Height-1) neighbours[x-1, y+1]++;
+                        if (y < Height-1) neighbours[x, y+1]++;
+                        if (x < Width-1 && y < Height-1) neighbours[x+1, y+1]++;
+                    }
+                }
+            }
+
+            // pass 2: life and death
+            for (var x = 0; x < Width; x++)
+            {
+                for (var y = 0; y < Height; y++)
+                {
+                    if (Cells[x,y] == '.')
+                    {
+                        if (neighbours[x,y] == 3)
+                        {
+                            Cells[x,y] = GetPrevalentTeam(x, y);
+                        }
+                    }
+                    else // living cell
+                    {
+                        if (neighbours[x,y] < 2 || neighbours[x,y] > 3)
+                        {
+                            Cells[x,y] = '.';
+                        }
+                    }
+                }
+            }
+        }
+        
+        // XXX sucks that this is separate from the main pass calculations
+        private char GetPrevalentTeam(int w, int h)
+        {
+            var zero = 0;
+            var one = 0;
+
+            for (var x = w-1; x <= w+1; x++)
+            {
+                for (var y = h-1; y <= h+1; y++)
+                {
+                    if (x < 0 || y < 0 || x == Width || y == Height) 
+                    {
+                        continue;
+                    }
+                    else if (Cells[x,y] == '0')
+                    {
+                        zero++;
+                    }
+                    else if (Cells[x,y] == '1')
+                    {
+                        one++;
+                    }
+                }
+            }
+
+            return (zero > one) ? '0' : '1';
+        }
+
+        // inefficient, but it's only used in tests
+        public override string ToString()
+        {
+            var builder = new StringBuilder();
+
+            for (var y = 0; y < Height; y++)
+            {
+                for (var x = 0; x < Width; x++)
+                {
+                    if (builder.Length != 0)
+                    {
+                        builder.Append(",");
+                    }
+                    builder.Append(Cells[x,y]);
+                }
+            }
+
+            return builder.ToString();
         }
     }
 }

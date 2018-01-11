@@ -8,7 +8,7 @@ namespace Yeine.Strategies
     {
         public Move Act(Game state)
         {
-            var baseValue = state.Field.CalculateValue(state.OurID, state.TheirID);
+            var baseValue = state.Field.CalculatePositionValue(state.OurID, state.TheirID);
             var bestValue = 0;
             var bestTarget = default(Point);
 
@@ -19,7 +19,11 @@ namespace Yeine.Strategies
                     if (state.Field.Cells[x,y] != '.')
                     {
                         var simField = state.Field.Clone();
-                        var simValue = simField.CalculateValue(state.OurID, state.TheirID) - baseValue;
+                        
+                        simField.Cells[x,y] = '.';
+                        simField.UpdatePosition();
+                        
+                        var simValue = simField.CalculatePositionValue(state.OurID, state.TheirID) - baseValue;
 
                         if (simValue > bestValue)
                         {
