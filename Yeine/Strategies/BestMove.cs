@@ -65,7 +65,7 @@ namespace Yeine.Strategies
 
             if (canBirth)
             {
-                var bestKillables = ownKillables.OrderByDescending(k => k.Value).Select(k => k.Target).Take(4).ToArray();
+                var bestKillables = ownKillables.OrderByDescending(k => k.Value).Take(4).Select(k => k.Target).ToArray();
 
                 for (var x = 0; x < state.Field.Width; x++)
                 {
