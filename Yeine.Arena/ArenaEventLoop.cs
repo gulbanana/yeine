@@ -10,16 +10,16 @@ namespace Yeine.Arena
     {        
         private readonly IStrategy p0;
         private readonly IStrategy p1;
-        private readonly bool verbose;
+        private readonly int verbosity;
         
         private readonly Random random;
         private readonly Stopwatch stopwatch;
 
-        public ArenaEventLoop(IStrategy player0, IStrategy player1, bool verbose)
+        public ArenaEventLoop(IStrategy player0, IStrategy player1, int verbosity)
         {
             p0 = player0;
             p1 = player1;
-            this.verbose = verbose;
+            this.verbosity = verbosity;
 
             random = new Random();
             stopwatch = new Stopwatch();
@@ -29,18 +29,38 @@ namespace Yeine.Arena
         {
             stopwatch.Restart();
 
+            int p0Wins = 0;
+            int p1Wins = 0;
+            int draws = 0;
+
             for (var i = 0; i < games; i++)
             {
                 var startingField = CreateRandomField(18, 16);
                 
-                Write($"==== {p0} vs {p1} ====");
-                PlayGame(startingField.Clone(), p0, p1);
+                if (verbosity >= 1) Write($"==== {p0} vs {p1} ====");
+                switch (PlayGame(startingField.Clone(), p0, p1))
+                {
+                    case Result.Player0Win: p0Wins++; break;
+                    case Result.Player1Win: p1Wins++; break;
+                    case Result.Draw: draws++; break;
+                }
                 
-                Write($"==== {p1} vs {p0} (mirror match) ====");
-                PlayGame(startingField.Clone(), p1, p0);
+                if (verbosity >= 1) Write($"==== {p1} vs {p0} (mirror match) ====");
+                switch (PlayGame(startingField.Clone(), p1, p0))
+                {
+                    case Result.Player0Win: p1Wins++; break;
+                    case Result.Player1Win: p0Wins++; break;
+                    case Result.Draw: draws++; break;
+                }
             }
 
             stopwatch.Stop();
+
+            var played = games*2;
+            Console.WriteLine($"{played} games played between {p0} and {p1}.");
+            Console.WriteLine($"{p0} wins: {p0Wins} ({p0Wins*100/played}%)");
+            Console.WriteLine($"{p1} wins: {p1Wins} ({p1Wins*100/played}%)");
+            Console.WriteLine($"Draws: {draws} ({draws*100/played}%)");
         }
 
         private Field CreateRandomField(int w, int h)
@@ -81,63 +101,44 @@ namespace Yeine.Arena
             return new Field(18, 16, cells);
         }
 
-        private void PlayGame(Field field, IStrategy p0, IStrategy p1)
+        private Result PlayGame(Field field, IStrategy p0, IStrategy p1)
         {
+            if (verbosity >= 2) Write(field.ToString());
             field.CalculateLivingCells('0', '1', out var c0, out var c1);
 
-            if (verbose) Write(field.ToString());
-
-            var s0 = new Game
-            {
-                OurName = "player0",
-                OurID = '0',
-                TheirID = '1'
-            };
-
-            var s1 = new Game
-            {
-                 OurName = "player1",
-                 OurID = '1',
-                 TheirID = '0'
-            };
-
+            var s0 = new Game { OurName = "player0", OurID = '0', TheirID = '1' };
+            var s1 = new Game { OurName = "player1", OurID = '1', TheirID = '0' };
             var round = 1;
+
+            bool PlayTurn(IStrategy player, Game state)
+            {
+                state.ParseField(field.Width, field.Height, field.ToString());
+                var m = player.Act(state);
+                field.ProcessCommand(m);
+                field.UpdatePosition();
+                var v = field.CalculatePositionValue('0', '1');
+                if (verbosity >= 2) Write($"Round {round}, player0 {m}, {(v>0 ? "+" : "")}{v}");
+
+                field.CalculateLivingCells('0', '1', out c0, out c1);
+                return c0 == 0 || c1 ==  0;
+            }
+
             while (round <= 100)
             {
-                s0.ParseField(field.Width, field.Height, field.ToString());
-                var m0 = p0.Act(s0);
-                field.ProcessCommand(m0);
-                field.UpdatePosition();
-                var v0 = field.CalculatePositionValue('0', '1');
-                if (verbose) Write($"Round {round}, player0 {m0}, {(v0>0 ? "+" : "")}{v0}");
-
-                field.CalculateLivingCells('0', '1', out c0, out c1);
-                if (!(c0 > 0 && c1 > 0))
-                {
-                    break;
-                }
-
-                s1.ParseField(field.Width, field.Height, field.ToString());
-                var m1 = p1.Act(s1);
-                field.ProcessCommand(m1);
-                field.UpdatePosition();
-                var v1 = field.CalculatePositionValue('0', '1');
-                if (verbose) Write($"Round {round}, player1 {m1}, {(v1>0 ? "+" : "")}{v1}");
-
-                field.CalculateLivingCells('0', '1', out c0, out c1);
-                if (!(c0 > 0 && c1 > 0))
-                {
-                    break;
-                }
-
+                if (PlayTurn(p0, s0)) break;
+                if (PlayTurn(p1, s1)) break;
                 round++;
             }
 
-            var result = (round > 100) ? "DRAW" : 
-                         (c0 > c1) ? p0.ToString() + " WIN" : 
-                         p1.ToString() + " WIN";
+            var isDraw = round > 100;
+            
+            if (verbosity >= 1)
+            {
+                var result = isDraw ? "DRAW" : (c0 > c1 ? p0 : p1).ToString() + " WIN";
+                Write($"{result} in {round-1} rounds - player0 {c0}, player1 {c1}");
+            }
 
-            Write($"{result} in {round-1} rounds - player0 {c0}, player1 {c1}");
+            return isDraw ? Result.Draw : c0 > c1 ? Result.Player0Win : Result.Player1Win;
         }
 
         private void Write(string line)
