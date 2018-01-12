@@ -6,15 +6,17 @@ using Yeine.State;
 
 namespace Yeine.Strategies
 {
-    /// <summary>Adapted from Riddles.io sample code as a control</summary>
-    public class Starter : IStrategy
+    /// <summary>Adapted from Riddles.io sample code 'golad-starterbot-cs'</summary>
+    public class RandomMoves : IStrategy
     {
         private Random Random;
 
-        public Starter()
+        public RandomMoves()
         {
             Random = new Random();
         }
+
+        public override string ToString() => nameof(RandomMoves);
 
         /// <summary>Performs a random Birth or Kill move (if possible)</summary>
         public Move Act(Game state)

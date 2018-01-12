@@ -6,5 +6,7 @@ namespace Yeine.Strategies
     public class AlwaysPass : IStrategy
     {
         public Move Act(Game state) => Move.Pass();
+
+        public override string ToString() => nameof(AlwaysPass);
     }
 }

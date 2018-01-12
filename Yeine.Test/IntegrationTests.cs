@@ -27,7 +27,7 @@ action move 10000";
         {
             var reader = new StringReader(script);
             var writer = new StringWriter();
-            var runner = new Runner(reader, writer, new Strategies.KillBest());
+            var runner = new BotEventLoop(reader, writer, new Strategies.KillBest());
             runner.Run();
 
             Assert.NotStrictEqual("pass" + Environment.NewLine, writer.ToString());

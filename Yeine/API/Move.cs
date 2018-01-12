@@ -6,12 +6,12 @@ namespace Yeine.API
     public class Move
     {
         public readonly MoveType Command;
-        private readonly Point[] arguments;
+        public readonly Point[] Arguments;
 
         private Move(MoveType type, params Point[] points) 
         {
             this.Command = type;
-            this.arguments = points;
+            this.Arguments = points;
         }
 
         public static Move Pass() => new Move(MoveType.Pass);
@@ -25,10 +25,10 @@ namespace Yeine.API
             StringBuilder builder = new StringBuilder();
             builder.Append(Command.ToString());
             
-            for (var i = 0; i < arguments.Length; i++)
+            for (var i = 0; i < Arguments.Length; i++)
             {
                 builder.Append(" ");
-                builder.Append(arguments[i].ToString());
+                builder.Append(Arguments[i].ToString());
             }
 
             return builder.ToString();

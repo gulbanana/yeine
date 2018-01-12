@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using Yeine.API;
 
 namespace Yeine.State
 {
@@ -70,6 +71,26 @@ namespace Yeine.State
             p1 = p1cells;
         }
 
+        public void ProcessCommand(Move move)
+        {
+            switch (move.Command)
+            {
+                case MoveType.Kill:
+                    var kTarget = move.Arguments[0];
+                    Cells[kTarget.X, kTarget.Y] = '.';
+                    break;
+
+                case MoveType.Birth:
+                    var bTarget = move.Arguments[0];
+                    Cells[bTarget.X, bTarget.Y] = GetPrevalentTeam(bTarget.X, bTarget.Y);
+                    var sac1 = move.Arguments[1];
+                    var sac2 = move.Arguments[2];
+                    Cells[sac1.X, sac1.Y] = '.';
+                    Cells[sac2.X, sac2.Y] = '.';
+                    break;
+            }
+        }
+
         public Field Clone()
         {
             return new Field(Width, Height, (char[,])Cells.Clone());
@@ -79,6 +100,16 @@ namespace Yeine.State
         {
             var ours = 0;
             var theirs = 0;
+
+            CalculateLivingCells(us, them, out ours, out theirs);
+
+            return ours - theirs;
+        }
+
+        public void CalculateLivingCells(char us, char them, out int ours, out int theirs)
+        {
+            ours = 0;
+            theirs = 0;
 
             for (var x = 0; x < Width; x++)
             {
@@ -94,8 +125,6 @@ namespace Yeine.State
                     }
                 }
             }
-
-            return ours - theirs;
         }
 
         public void UpdatePosition()

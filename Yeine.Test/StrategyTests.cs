@@ -22,7 +22,7 @@ namespace Yeine.Test
         {
             state.ParseField(2, 2, "0,0,1,.");
 
-            var strat = new Starter();
+            var strat = new RandomMoves();
             var move = strat.Act(state);
 
             Assert.NotEqual(MoveType.Pass, move.Command);
@@ -33,7 +33,7 @@ namespace Yeine.Test
         {
             state.ParseField(1, 1, ".");
 
-            var strat = new Starter();
+            var strat = new RandomMoves();
             var move = strat.Act(state);
 
             Assert.Equal(MoveType.Pass, move.Command);

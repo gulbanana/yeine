@@ -10,8 +10,8 @@ namespace Yeine
         {
             using (var wideIn = new StreamReader(Console.OpenStandardInput(512)))
             {
-                Runner game = new Runner(wideIn, Console.Out, new Strategies.KillBest());
-                game.Run();
+                var eventLoop = new BotEventLoop(new StreamReader(Console.OpenStandardInput(512)), Console.Out, new Strategies.KillBest());
+                eventLoop.Run();
             }
         }
     }

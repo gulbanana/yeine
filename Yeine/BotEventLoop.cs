@@ -6,7 +6,7 @@ using Yeine.State;
 
 namespace Yeine
 {
-    public class Runner
+    public class BotEventLoop
     {
         private readonly TextReader input;
         private readonly TextWriter output;
@@ -15,7 +15,7 @@ namespace Yeine
         private readonly Parser parser;
         private readonly Stopwatch timer;
 
-        public Runner(TextReader input, TextWriter output, IStrategy strategy)
+        public BotEventLoop(TextReader input, TextWriter output, IStrategy strategy)
         {
             this.input = input;
             this.output = output;

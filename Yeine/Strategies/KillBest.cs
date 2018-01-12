@@ -46,5 +46,7 @@ namespace Yeine.Strategies
                 return Move.Pass();
             }
         }
+
+        public override string ToString() => nameof(KillBest);
     }
 }
