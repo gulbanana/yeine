@@ -93,7 +93,7 @@ namespace Yeine.Arena
         private Result PlayGame(Field field, IStrategy p0, IStrategy p1)
         {
             if (verbosity >= 2) Write(field.ToString());
-            field.CalculateLivingCells('0', '1', out var c0, out var c1);
+            field.EvaluateLivingCells('0', '1', out var c0, out var c1);
 
             var s0 = new Game { OurName = "player0", OurID = '0', TheirID = '1' };
             var s1 = new Game { OurName = "player1", OurID = '1', TheirID = '0' };
@@ -108,7 +108,7 @@ namespace Yeine.Arena
                 var v = field.CalculatePositionValue('0', '1');
                 if (verbosity >= 2) Write($"Round {round}, player0 {m}, {(v>0 ? "+" : "")}{v}");
 
-                field.CalculateLivingCells('0', '1', out c0, out c1);
+                field.EvaluateLivingCells('0', '1', out c0, out c1);
                 return c0 == 0 || c1 ==  0;
             }
 

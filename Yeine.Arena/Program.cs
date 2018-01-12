@@ -13,7 +13,7 @@ namespace Yeine.Arena
             var isVerbose = args.Any(a => a == "-v" || a == "--verbose");
             var isVeryVerbose = args.Any(a => a == "-vv" || a == "--veryVerbose");
 
-            var eventLoop = new ArenaEventLoop(new Strategies.KillBest(1), new Strategies.KillBest(5), isVeryVerbose ? 2 : isVerbose ? 1 : 0);
+            var eventLoop = new ArenaEventLoop(new Strategies.BestMove(5, false), new Strategies.BestMove(5, true), isVeryVerbose ? 2 : isVerbose ? 1 : 0);
             eventLoop.Run(int.Parse(count));
         }
     }

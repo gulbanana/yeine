@@ -6,6 +6,9 @@ namespace Yeine.State
 {
     public struct Field
     {
+        private static int updates;
+        private static int evaluations;
+
         public readonly int Width;
         public readonly int Height;
         public readonly char[,] Cells;
@@ -101,13 +104,15 @@ namespace Yeine.State
             var ours = 0;
             var theirs = 0;
 
-            CalculateLivingCells(us, them, out ours, out theirs);
+            EvaluateLivingCells(us, them, out ours, out theirs);
 
             return ours - theirs;
         }
 
-        public void CalculateLivingCells(char us, char them, out int ours, out int theirs)
+        public void EvaluateLivingCells(char us, char them, out int ours, out int theirs)
         {
+            evaluations++;
+
             ours = 0;
             theirs = 0;
 
@@ -129,6 +134,8 @@ namespace Yeine.State
 
         public void UpdatePosition()
         {
+            updates++;
+
             var neighbours = new int[Width, Height];
 
             // pass 1: count neighbours
@@ -221,6 +228,11 @@ namespace Yeine.State
             }
 
             return builder.ToString();
+        }
+
+        public static string ReportStats()
+        {
+            return $"{updates} updates, {evaluations} evaluations";
         }
     }
 }
