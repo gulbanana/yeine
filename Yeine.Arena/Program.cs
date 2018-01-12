@@ -9,8 +9,11 @@ namespace Yeine.Arena
     {
         static void Main(string[] args)
         {
-            var eventLoop = new ArenaEventLoop(new Strategies.AlwaysPass(), new Strategies.KillBest(), verbose: args.Any(a => a == "-v" || a == "--verbose"));
-            eventLoop.Run();
+            var count = args.SingleOrDefault(a => int.TryParse(a, out _)) ?? "1";
+            var isVerbose = args.Any(a => a == "-v" || a == "--verbose");
+
+            var eventLoop = new ArenaEventLoop(new Strategies.AlwaysPass(), new Strategies.KillBest(), isVerbose);
+            eventLoop.Run(int.Parse(count));
         }
     }
 }

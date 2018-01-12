@@ -7,39 +7,101 @@ using Yeine.State;
 namespace Yeine.Arena
 {
     public class ArenaEventLoop
-    {
-        private readonly Stopwatch stopwatch;
+    {        
         private readonly IStrategy p0;
         private readonly IStrategy p1;
         private readonly bool verbose;
+        
+        private readonly Random random;
+        private readonly Stopwatch stopwatch;
 
         public ArenaEventLoop(IStrategy player0, IStrategy player1, bool verbose)
         {
             p0 = player0;
             p1 = player1;
             this.verbose = verbose;
+
+            random = new Random();
             stopwatch = new Stopwatch();
         }
 
-        public void Run()
+        public void Run(int games)
         {
             stopwatch.Restart();
 
-            var games = CreateGamePair();
-            
-            Write($"==== {p0} vs {p1} ====");
-            PlayGame(p0, games.s0a, p1, games.s1a);
-            
-            Write($"==== {p1} vs {p0} (mirror match) ====");
-            PlayGame(p1, games.s0b, p0, games.s1b);
+            for (var i = 0; i < games; i++)
+            {
+                var startingField = CreateRandomField(18, 16);
+                
+                Write($"==== {p0} vs {p1} ====");
+                PlayGame(startingField.Clone(), p0, p1);
+                
+                Write($"==== {p1} vs {p0} (mirror match) ====");
+                PlayGame(startingField.Clone(), p1, p0);
+            }
+
+            stopwatch.Stop();
         }
 
-        private void PlayGame(IStrategy p0, Game s0, IStrategy p1, Game s1)
+        private Field CreateRandomField(int w, int h)
         {
-            var round = 1;
-            var field = s0.Field.Clone();
+            var cells = new char[w,h];
+            for (var x = 0; x < w; x++)
+            {
+                for (var y = 0; y < h; y++)
+                {
+                    cells[x,y] = '.';
+                }
+            }
+
+            for (var i = 0; i < 40;)
+            {
+                var x = random.Next(0, w-1);
+                var y = random.Next(0, (h/2)-1);
+
+                if (cells[x,y] == '.')
+                {
+                    cells[x,y] = '0';
+                    i++;
+                }
+            }
+
+            for (var i = 0; i < 40; i++)
+            {
+                var x = random.Next(0, w-1);
+                var y = random.Next(0, (h/2)-1) + h/2;
+
+                if (cells[x,y] == '.')
+                {
+                    cells[x,y] = '1';
+                    i++;
+                }
+            }
+
+            return new Field(18, 16, cells);
+        }
+
+        private void PlayGame(Field field, IStrategy p0, IStrategy p1)
+        {
             field.CalculateLivingCells('0', '1', out var c0, out var c1);
 
+            if (verbose) Write(field.ToString());
+
+            var s0 = new Game
+            {
+                OurName = "player0",
+                OurID = '0',
+                TheirID = '1'
+            };
+
+            var s1 = new Game
+            {
+                 OurName = "player1",
+                 OurID = '1',
+                 TheirID = '0'
+            };
+
+            var round = 1;
             while (round <= 100)
             {
                 s0.ParseField(field.Width, field.Height, field.ToString());
@@ -76,48 +138,6 @@ namespace Yeine.Arena
                          p1.ToString() + " WIN";
 
             Write($"{result} in {round-1} rounds - player0 {c0}, player1 {c1}");
-        }
-
-        // play from both sides to eliminate the first-turn factor
-        private (Game s0a, Game s1a, Game s0b, Game s1b) CreateGamePair()
-        {
-            var s0a = new Game
-            {
-                OurName = "player0",
-                OurID = '0',
-                TheirID = '1'
-            };
-
-            var s0b = new Game
-            {
-                OurName = "player0",
-                OurID = '0',
-                TheirID = '1'
-            };
-
-            var s1a = new Game
-            {
-                 OurName = "player1",
-                 OurID = '1',
-                 TheirID = '0'
-            };
-
-            var s1b = new Game
-            {
-                 OurName = "player1",
-                 OurID = '1',
-                 TheirID = '0'
-            };
-
-            // XXX this should be random - it's a specific game picked from the leaderboard
-            var startingCells = ".,.,.,.,0,.,0,.,0,.,0,0,0,.,.,.,0,.,.,0,.,0,.,.,.,.,.,.,.,.,0,.,0,.,.,.,.,.,.,0,.,0,.,0,0,0,0,.,.,0,0,0,.,.,.,.,.,.,.,0,.,.,0,.,.,.,0,.,.,.,.,0,.,.,.,0,.,.,.,.,.,.,0,.,.,0,.,.,.,0,.,.,0,.,0,.,0,.,.,.,0,.,.,.,.,0,.,.,.,.,0,.,.,0,.,.,.,0,.,.,.,.,.,0,.,.,.,.,.,.,.,.,.,0,.,.,.,.,.,.,.,0,0,.,.,1,1,.,.,.,.,.,.,.,1,.,.,.,.,.,.,.,.,.,1,.,.,.,.,.,1,.,.,.,1,.,.,1,.,.,.,.,1,.,.,.,.,1,.,.,.,1,.,1,.,1,.,.,1,.,.,.,1,.,.,1,.,.,.,.,.,.,1,.,.,.,1,.,.,.,.,1,.,.,.,1,.,.,1,.,.,.,.,.,.,.,1,1,1,.,.,1,1,1,1,.,1,.,1,.,.,.,.,.,.,1,.,1,.,.,.,.,.,.,.,.,1,.,1,.,.,1,.,.,.,1,1,1,.,1,.,1,.,1,.,.,.,.";
-
-            s0a.ParseField(18, 16, startingCells);
-            s0b.ParseField(18, 16, startingCells);
-            s1a.ParseField(18, 16, startingCells);
-            s1b.ParseField(18, 16, startingCells);
-
-            return (s0a, s1a, s0b, s1b);
         }
 
         private void Write(string line)
