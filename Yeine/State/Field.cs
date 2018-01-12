@@ -71,7 +71,7 @@ namespace Yeine.State
             p1 = p1cells;
         }
 
-        public void ProcessCommand(Move move)
+        public void ProcessCommand(Move move, char us)
         {
             switch (move.Command)
             {
@@ -82,7 +82,7 @@ namespace Yeine.State
 
                 case MoveType.Birth:
                     var bTarget = move.Arguments[0];
-                    Cells[bTarget.X, bTarget.Y] = GetPrevalentTeam(bTarget.X, bTarget.Y);
+                    Cells[bTarget.X, bTarget.Y] = us;
                     var sac1 = move.Arguments[1];
                     var sac2 = move.Arguments[2];
                     Cells[sac1.X, sac1.Y] = '.';

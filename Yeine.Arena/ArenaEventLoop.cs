@@ -82,18 +82,7 @@ namespace Yeine.Arena
                 if (cells[x,y] == '.')
                 {
                     cells[x,y] = '0';
-                    i++;
-                }
-            }
-
-            for (var i = 0; i < 40; i++)
-            {
-                var x = random.Next(0, w-1);
-                var y = random.Next(0, (h/2)-1) + h/2;
-
-                if (cells[x,y] == '.')
-                {
-                    cells[x,y] = '1';
+                    cells[x,h-1-y] = '1';
                     i++;
                 }
             }
@@ -114,7 +103,7 @@ namespace Yeine.Arena
             {
                 state.ParseField(field.Width, field.Height, field.ToString());
                 var m = player.Act(state);
-                field.ProcessCommand(m);
+                field.ProcessCommand(m, state.OurID);
                 field.UpdatePosition();
                 var v = field.CalculatePositionValue('0', '1');
                 if (verbosity >= 2) Write($"Round {round}, player0 {m}, {(v>0 ? "+" : "")}{v}");
