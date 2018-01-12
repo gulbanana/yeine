@@ -51,7 +51,7 @@ namespace Yeine.Test
         [Fact]
         public void KillBest_DoesntCrash()
         {
-            var strat = new KillBest();
+            var strat = new KillBest(1);
             var move = strat.Act(state);
         }
     }

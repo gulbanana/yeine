@@ -6,10 +6,17 @@ namespace Yeine.Strategies
     /// <summary>Kill the cell which has the greatest positive impact on gamestate</summary>
     public class KillBest : IStrategy
     {
+        private readonly int lookahead;
+
+        public KillBest(int lookahead)
+        {
+            this.lookahead = lookahead;
+        }
+
         public Move Act(Game state)
         {
             var basePosition = state.Field.Clone();
-            basePosition.UpdatePosition();
+            for (var i = 0; i < lookahead; i++) basePosition.UpdatePosition();
             var baseValue = basePosition.CalculatePositionValue(state.OurID, state.TheirID);
 
             var bestValue = 0;
@@ -24,7 +31,7 @@ namespace Yeine.Strategies
                         var simField = state.Field.Clone();
                         
                         simField.Cells[x,y] = '.';
-                        simField.UpdatePosition();
+                        for (var i = 0; i < lookahead; i++) simField.UpdatePosition();
 
                         var simValue = simField.CalculatePositionValue(state.OurID, state.TheirID) - baseValue;
 
@@ -47,6 +54,6 @@ namespace Yeine.Strategies
             }
         }
 
-        public override string ToString() => nameof(KillBest);
+        public override string ToString() => $"{nameof(KillBest)}(lookahead: {lookahead})";
     }
 }

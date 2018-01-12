@@ -10,7 +10,7 @@ namespace Yeine
         {
             using (var wideIn = new StreamReader(Console.OpenStandardInput(512)))
             {
-                var eventLoop = new BotEventLoop(new StreamReader(Console.OpenStandardInput(512)), Console.Out, new Strategies.KillBest());
+                var eventLoop = new BotEventLoop(new StreamReader(Console.OpenStandardInput(512)), Console.Out, new Strategies.KillBest(5));
                 eventLoop.Run();
             }
         }
