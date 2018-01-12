@@ -8,7 +8,10 @@ namespace Yeine.Strategies
     {
         public Move Act(Game state)
         {
-            var baseValue = state.Field.CalculatePositionValue(state.OurID, state.TheirID);
+            var basePosition = state.Field.Clone();
+            basePosition.UpdatePosition();
+            var baseValue = basePosition.CalculatePositionValue(state.OurID, state.TheirID);
+
             var bestValue = 0;
             var bestTarget = default(Point);
 
