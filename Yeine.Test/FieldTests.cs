@@ -44,18 +44,6 @@ namespace Yeine.Test
         }
 
         [Theory]
-        [InlineData(1, 1, ".", 0)]
-        [InlineData(1, 1, "0", 1)]
-        [InlineData(1, 1, "1", -1)]
-        [InlineData(3, 3, "0,0,.,0,.,.,.,.,1", 2)]
-        public void CalculateValue(int w, int h, string cells, int result)
-        {
-            var f = new Field(w, h, cells);
-
-            Assert.Equal(result, f.CalculatePositionValue('0', '1'));
-        }
-
-        [Theory]
         [InlineData(1, 1, ".")]
         [InlineData(3, 3, ".,0,.,.,0,0,.,.,.")]
         public void ToString_Idempotent(int w, int h, string cells)

@@ -9,21 +9,19 @@ namespace Yeine.Strategies
     public class BestMove : IStrategy
     {
         private readonly int lookahead;
-        private readonly bool canBirth;
         private readonly List<CostedMove> ownKillables;
         
-        public BestMove(int lookahead, bool canBirth)
+        public BestMove(int lookahead)
         {
             this.lookahead = lookahead;
-            this.canBirth = canBirth;
             ownKillables = new List<CostedMove>();
         }
 
-        public Move Act(Game state)
+        public Move Act(Game state, IEvaluator evaluator)
         {
             var basePosition = state.Field.Clone();
             for (var i = 0; i < lookahead; i++) basePosition.UpdatePosition();
-            var baseValue = basePosition.CalculatePositionValue(state.OurID, state.TheirID);
+            var baseValue = evaluator.EvaluatePosition(state, basePosition);
 
             var bestKillValue = 0;
             var bestKillTarget = default(Point);
@@ -42,7 +40,7 @@ namespace Yeine.Strategies
                         {
                             simField.UpdatePosition();
                         }
-                        var simValue = simField.CalculatePositionValue(state.OurID, state.TheirID) - baseValue;
+                        var simValue = evaluator.EvaluatePosition(state, simField) - baseValue;
 
                         if (simValue > bestKillValue)
                         {
@@ -62,39 +60,35 @@ namespace Yeine.Strategies
             var bestBirthTarget = default(Point);
             var bestBirthSac1 = default(Point);
             var bestBirthSac2 = default(Point);
+            var bestKillables = ownKillables.OrderByDescending(k => k.Value).Take(4).Select(k => k.Target).ToArray();
 
-            if (canBirth)
+            for (var x = 0; x < state.Field.Width; x++)
             {
-                var bestKillables = ownKillables.OrderByDescending(k => k.Value).Take(4).Select(k => k.Target).ToArray();
-
-                for (var x = 0; x < state.Field.Width; x++)
+                for (var y = 0; y < state.Field.Height; y++)
                 {
-                    for (var y = 0; y < state.Field.Height; y++)
+                    if (state.Field.Cells[x,y] == '.')
                     {
-                        if (state.Field.Cells[x,y] == '.')
+                        // potential birth target. try each combo of own-killables
+                        for (var s1 = 0; s1 < bestKillables.Length - 1; s1++)
                         {
-                            // potential birth target. try each combo of own-killables
-                            for (var s1 = 0; s1 < bestKillables.Length - 1; s1++)
+                            for (var s2 = s1+1; s2 < bestKillables.Length; s2++)
                             {
-                                for (var s2 = s1+1; s2 < bestKillables.Length; s2++)
+                                var simField = state.Field.Clone();
+
+                                simField.Cells[x,y] = state.OurID;
+                                simField.Cells[bestKillables[s1].X,bestKillables[s1].Y] = '.';
+                                simField.Cells[bestKillables[s2].X,bestKillables[s2].Y] = '.';
+
+                                for (var i = 0; i < lookahead; i++) simField.UpdatePosition();
+
+                                var simValue = evaluator.EvaluatePosition(state, simField) - baseValue;
+
+                                if (simValue > bestBirthValue)
                                 {
-                                    var simField = state.Field.Clone();
-
-                                    simField.Cells[x,y] = state.OurID;
-                                    simField.Cells[bestKillables[s1].X,bestKillables[s1].Y] = '.';
-                                    simField.Cells[bestKillables[s2].X,bestKillables[s2].Y] = '.';
-
-                                    for (var i = 0; i < lookahead; i++) simField.UpdatePosition();
-
-                                    var simValue = simField.CalculatePositionValue(state.OurID, state.TheirID) - baseValue;
-
-                                    if (simValue > bestBirthValue)
-                                    {
-                                        bestBirthValue = simValue;
-                                        bestBirthTarget = new Point(x, y);
-                                        bestBirthSac1 = bestKillables[s1];
-                                        bestBirthSac2 = bestKillables[s2];
-                                    }
+                                    bestBirthValue = simValue;
+                                    bestBirthTarget = new Point(x, y);
+                                    bestBirthSac1 = bestKillables[s1];
+                                    bestBirthSac2 = bestKillables[s2];
                                 }
                             }
                         }
@@ -104,7 +98,7 @@ namespace Yeine.Strategies
 
             //state.Log(Field.ReportStats());
 
-            if (canBirth && bestBirthValue > bestKillValue)
+            if (bestBirthValue > bestKillValue)
             {
                 return Move.Birth(bestBirthTarget, bestBirthSac1, bestBirthSac2);
             }
@@ -118,6 +112,6 @@ namespace Yeine.Strategies
             }
         }
 
-        public override string ToString() => $"{nameof(BestMove)}(lookahead: {lookahead}, canBirth: {canBirth})";
+        public override string ToString() => $"{nameof(BestMove)}(lookahead: {lookahead})";
     }
 }

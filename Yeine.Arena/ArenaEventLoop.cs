@@ -6,20 +6,20 @@ using Yeine.State;
 
 namespace Yeine.Arena
 {
-    public class ArenaEventLoop
+    class ArenaEventLoop
     {        
-        private readonly IStrategy p0;
-        private readonly IStrategy p1;
         private readonly int verbosity;
-        
+        private readonly Bot p0;
+        private readonly Bot p1;
+
         private readonly Random random;
         private readonly Stopwatch stopwatch;
 
-        public ArenaEventLoop(IStrategy player0, IStrategy player1, int verbosity)
+        public ArenaEventLoop(int verbosity, Bot p0, Bot p1)
         {
-            p0 = player0;
-            p1 = player1;
             this.verbosity = verbosity;
+            this.p0 = p0;
+            this.p1 = p1;
 
             random = new Random();
             stopwatch = new Stopwatch();
@@ -90,7 +90,7 @@ namespace Yeine.Arena
             return new Field(18, 16, cells);
         }
 
-        private Result PlayGame(Field field, IStrategy p0, IStrategy p1)
+        private Result PlayGame(Field field, Bot p0, Bot p1)
         {
             if (verbosity >= 2) Write(field.ToString());
             field.EvaluateLivingCells('0', '1', out var c0, out var c1);
@@ -99,13 +99,13 @@ namespace Yeine.Arena
             var s1 = new Game { OurName = "player1", OurID = '1', TheirID = '0' };
             var round = 1;
 
-            bool PlayTurn(IStrategy player, Game state)
+            bool PlayTurn(IStrategy strat, IEvaluator eval, Game state)
             {
                 state.ParseField(field.Width, field.Height, field.ToString());
-                var m = player.Act(state);
+                var m = strat.Act(state, eval);
                 field.ProcessCommand(m, state.OurID);
                 field.UpdatePosition();
-                var v = field.CalculatePositionValue('0', '1');
+                var v = eval.EvaluatePosition(state, field);
                 if (verbosity >= 2) Write($"Round {round}, player0 {m}, {(v>0 ? "+" : "")}{v}");
 
                 field.EvaluateLivingCells('0', '1', out c0, out c1);
@@ -114,8 +114,8 @@ namespace Yeine.Arena
 
             while (round <= 100)
             {
-                if (PlayTurn(p0, s0)) break;
-                if (PlayTurn(p1, s1)) break;
+                if (PlayTurn(p0.Strategy, p0.Evaluator, s0)) break;
+                if (PlayTurn(p1.Strategy, p1.Evaluator, s1)) break;
                 round++;
             }
 

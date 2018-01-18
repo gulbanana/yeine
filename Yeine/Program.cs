@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Yeine.Evaluators;
 using Yeine.Strategies;
 
 namespace Yeine
@@ -10,7 +11,12 @@ namespace Yeine
         {
             using (var wideIn = new StreamReader(Console.OpenStandardInput(512)))
             {
-                var eventLoop = new BotEventLoop(new StreamReader(Console.OpenStandardInput(512)), Console.Out, new Strategies.BestMove(5, canBirth: true));
+                var eventLoop = new BotEventLoop(
+                    new StreamReader(Console.OpenStandardInput(512)), 
+                    Console.Out, 
+                    new Strategies.BestMove(5),
+                    new OursMinusTheirs());
+                    
                 eventLoop.Run();
             }
         }

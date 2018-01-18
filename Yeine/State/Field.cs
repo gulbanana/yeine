@@ -99,16 +99,6 @@ namespace Yeine.State
             return new Field(Width, Height, (char[,])Cells.Clone());
         }
 
-        public int CalculatePositionValue(char us, char them)
-        {
-            var ours = 0;
-            var theirs = 0;
-
-            EvaluateLivingCells(us, them, out ours, out theirs);
-
-            return ours - theirs;
-        }
-
         public void EvaluateLivingCells(char us, char them, out int ours, out int theirs)
         {
             evaluations++;

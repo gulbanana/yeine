@@ -5,6 +5,6 @@ namespace Yeine
 {
     public interface IStrategy
     {
-        Move Act(Game state);
+        Move Act(Game state, IEvaluator evaluator);
     }
 }
