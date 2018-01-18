@@ -126,25 +126,38 @@ namespace Yeine.State
         {
             updates++;
 
-            var neighbours = new int[Width, Height];
+            var neighbours = new int[2, Width, Height];
 
             // pass 1: count neighbours
             for (var x = 0; x < Width; x++)
             {
                 for (var y = 0; y < Height; y++)
                 {
-                    if (Cells[x,y] != '.')
+                    if (Cells[x,y] == '0')
                     {
-                        if (x > 0 && y > 0) neighbours[x-1, y-1]++;
-                        if (y > 0) neighbours[x, y-1]++;
-                        if (x < Width-1 && y > 0) neighbours[x+1, y-1]++;
+                        if (x > 0 && y > 0) neighbours[0, x-1, y-1]++;
+                        if (y > 0) neighbours[0, x, y-1]++;
+                        if (x < Width-1 && y > 0) neighbours[0, x+1, y-1]++;
 
-                        if (x > 0) neighbours[x-1, y]++;
-                        if (x < Width-1) neighbours[x+1, y]++;
+                        if (x > 0) neighbours[0, x-1, y]++;
+                        if (x < Width-1) neighbours[0, x+1, y]++;
 
-                        if (x > 0 && y < Height-1) neighbours[x-1, y+1]++;
-                        if (y < Height-1) neighbours[x, y+1]++;
-                        if (x < Width-1 && y < Height-1) neighbours[x+1, y+1]++;
+                        if (x > 0 && y < Height-1) neighbours[0, x-1, y+1]++;
+                        if (y < Height-1) neighbours[0, x, y+1]++;
+                        if (x < Width-1 && y < Height-1) neighbours[0, x+1, y+1]++;
+                    }
+                    else if (Cells[x,y] == '1')
+                    {
+                        if (x > 0 && y > 0) neighbours[1, x-1, y-1]++;
+                        if (y > 0) neighbours[1, x, y-1]++;
+                        if (x < Width-1 && y > 0) neighbours[1, x+1, y-1]++;
+
+                        if (x > 0) neighbours[1, x-1, y]++;
+                        if (x < Width-1) neighbours[1, x+1, y]++;
+
+                        if (x > 0 && y < Height-1) neighbours[1, x-1, y+1]++;
+                        if (y < Height-1) neighbours[1, x, y+1]++;
+                        if (x < Width-1 && y < Height-1) neighbours[1, x+1, y+1]++;
                     }
                 }
             }
@@ -154,16 +167,17 @@ namespace Yeine.State
             {
                 for (var y = 0; y < Height; y++)
                 {
+                    var totalNeighbours = neighbours[0,x,y] + neighbours[1,x,y];
                     if (Cells[x,y] == '.')
-                    {
-                        if (neighbours[x,y] == 3)
+                    {                        
+                        if (totalNeighbours == 3)
                         {
-                            Cells[x,y] = GetPrevalentTeam(x, y);
+                            Cells[x,y] = neighbours[0,x,y] > neighbours[1,x,y] ? '0' : '1';
                         }
                     }
                     else // living cell
                     {
-                        if (neighbours[x,y] < 2 || neighbours[x,y] > 3)
+                        if (totalNeighbours < 2 || totalNeighbours > 3)
                         {
                             Cells[x,y] = '.';
                         }
@@ -172,34 +186,6 @@ namespace Yeine.State
             }
         }
         
-        // XXX sucks that this is separate from the main pass calculations
-        private char GetPrevalentTeam(int w, int h)
-        {
-            var zero = 0;
-            var one = 0;
-
-            for (var x = w-1; x <= w+1; x++)
-            {
-                for (var y = h-1; y <= h+1; y++)
-                {
-                    if (x < 0 || y < 0 || x == Width || y == Height) 
-                    {
-                        continue;
-                    }
-                    else if (Cells[x,y] == '0')
-                    {
-                        zero++;
-                    }
-                    else if (Cells[x,y] == '1')
-                    {
-                        one++;
-                    }
-                }
-            }
-
-            return (zero > one) ? '0' : '1';
-        }
-
         // inefficient, but it's only used in tests
         public override string ToString()
         {
