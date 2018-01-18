@@ -1,6 +1,6 @@
 namespace Yeine.Arena
 {
-    enum Result 
+    public enum GameResult 
     {
         Player0Win,
         Player1Win,

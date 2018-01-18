@@ -1,6 +1,6 @@
 namespace Yeine.Arena
 {
-    class Bot
+    public class Bot
     {
         public readonly IStrategy Strategy;
         public readonly IEvaluator Evaluator;
