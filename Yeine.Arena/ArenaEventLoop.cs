@@ -57,10 +57,7 @@ namespace Yeine.Arena
             stopwatch.Stop();
 
             var played = games*2;
-            Console.WriteLine($"{played} games played between {p0} and {p1}.");
-            Console.WriteLine($"{p0} wins: {p0Wins} ({p0Wins*100/played}%)");
-            Console.WriteLine($"{p1} wins: {p1Wins} ({p1Wins*100/played}%)");
-            Console.WriteLine($"Draws: {draws} ({draws*100/played}%)");
+            Console.WriteLine($"{played} games played between '{p0}' and '{p1}'. Win/Lose/Draw {p0Wins}/{p1Wins}/{draws} ({p0Wins*100/played}%/{p1Wins*100/played}%/{draws*100/played}%).");
         }
 
         private Field CreateRandomField(int w, int h)

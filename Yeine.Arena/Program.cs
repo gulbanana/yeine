@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Yeine.Strategies;
@@ -15,33 +16,24 @@ namespace Yeine.Arena
 
             var strategies = new IStrategy[]
             {
-                new Strategies.BestMove(3),
+                new Strategies.BestMove(2),
                 new Strategies.BestMove(5)
             };
 
             var evaluators = new IEvaluator[]
             {
-                new Evaluators.OursMinusTheirs()
+                new Evaluators.OursMinusTheirs(),
+                new Evaluators.RecogniseEnd(new Evaluators.OursMinusTheirs())
             };
 
-            for (var i = 0; i < strategies.Length; i++)
-            {
-                for (var j = 0; j < strategies.Length; j++)
-                {
-                    var strat1 = strategies[i];
-                    var strat2 = strategies[j];
-                    foreach (var eval1 in evaluators)
-                    {
-                        foreach (var eval2 in evaluators)
-                        {
-                            var eventLoop = new ArenaEventLoop(
-                                isVeryVerbose ? 2 : isVerbose ? 1 : 0,
-                                new Bot(strat1, eval1),
-                                new Bot(strat2, eval2));
+            var bots = (from s in strategies from e in evaluators select new Bot(s, e)).ToArray();
 
-                            eventLoop.Run(int.Parse(count));
-                        }
-                    }
+            for (var b1 = 0; b1 < bots.Length-1; b1++)
+            {
+                for (var b2 = b1+1; b2 < bots.Length; b2++)
+                {
+                    var eventLoop = new ArenaEventLoop(isVeryVerbose ? 2 : isVerbose ? 1 : 0, bots[b1], bots[b2]);
+                    eventLoop.Run(int.Parse(count));
                 }
             }
         }
