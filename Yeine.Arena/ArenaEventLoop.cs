@@ -9,11 +9,11 @@ namespace Yeine.Arena
     class ArenaEventLoop
     {        
         private readonly int verbosity;
-        private readonly Bot p0;
-        private readonly Bot p1;
+        private readonly IStrategy p0;
+        private readonly IStrategy p1;
         private readonly Random random;
 
-        public ArenaEventLoop(int verbosity, Bot p0, Bot p1)
+        public ArenaEventLoop(int verbosity, IStrategy p0, IStrategy p1)
         {
             this.verbosity = verbosity;
             this.p0 = p0;
@@ -49,7 +49,7 @@ namespace Yeine.Arena
             }
 
             var played = games*2;
-            Console.WriteLine($"{played} games played between '{p0}' and '{p1}'. Win/Lose/Draw {p0Wins}/{p1Wins}/{draws} ({p0Wins*100/played}%/{p1Wins*100/played}%/{draws*100/played}%).");
+            Console.WriteLine($"{p0} vs {p1}, {played} games: {p0Wins}W / {p1Wins}L / {draws}D ({p0Wins*100/played}% / {p1Wins*100/played}% / {draws*100/played}%).");
         }
 
         private Field CreateRandomField(int w, int h)

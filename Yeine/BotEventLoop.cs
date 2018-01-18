@@ -11,17 +11,15 @@ namespace Yeine
         private readonly TextReader input;
         private readonly TextWriter output;
         private readonly IStrategy strategy;
-        private readonly IEvaluator evaluator;
         private readonly Game state;
         private readonly Parser parser;
         private readonly Stopwatch timer;
 
-        public BotEventLoop(TextReader input, TextWriter output, IStrategy strategy, IEvaluator evaluator)
+        public BotEventLoop(TextReader input, TextWriter output, IStrategy strategy)
         {
             this.input = input;
             this.output = output;
             this.strategy = strategy;
-            this.evaluator = evaluator;
             this.state = new Game();
             this.parser = new Parser(state);
             this.timer = new Stopwatch();
@@ -41,7 +39,7 @@ namespace Yeine
                     state.Log($"begin turn, {timeout}ms available");
                     timer.Restart();
 
-                    var move = strategy.Act(state, evaluator);
+                    var move = strategy.Act(state);
 
                     timer.Stop();
                     state.Log($"end turn, {timer.ElapsedMilliseconds}ms used");

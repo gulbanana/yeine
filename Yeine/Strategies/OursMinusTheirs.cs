@@ -1,8 +1,8 @@
 using Yeine.State;
 
-namespace Yeine.Evaluators
+namespace Yeine.Strategies
 {
-    public class OursMinusTheirs : IEvaluator
+    public class OursMinusTheirs : IMoveEvaluator
     {
         public int EvaluatePosition(Game state, Field position)
         {
@@ -14,6 +14,6 @@ namespace Yeine.Evaluators
             return ours - theirs;
         }
 
-        public override string ToString() => nameof(OursMinusTheirs);
+        public override string ToString() => "basic";
     }
 }

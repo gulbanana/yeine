@@ -15,20 +15,21 @@ namespace Yeine.Arena
             var isVerbose = args.Any(a => a == "-v" || a == "--verbose");
             var isVeryVerbose = args.Any(a => a == "-vv" || a == "--veryVerbose");
 
-            var strategies = new IStrategy[]
+            var strategies = new Func<IMoveEvaluator, IStrategy>[]
             {
-                new Strategies.BestMove(3, 5),
-                new Strategies.BestMove(5, 4),
+                e => new Strategies.BestMove(e, 2, 2),
+                e => new Strategies.BestMove(e, 3, 2),
+                e => new Strategies.BestMove(e, 4, 2),
+                e => new Strategies.BestMove(e, 5, 2),
             };
 
-            var evaluators = new IEvaluator[]
+            var evaluators = new IMoveEvaluator[]
             {
-                new Evaluators.OursMinusTheirs(),
-                new Evaluators.RecogniseEnd(new Evaluators.OursMinusTheirs()),
+                new Strategies.OursMinusTheirs(),
             };
 
-            var bots = (from s in strategies from e in evaluators select new Bot(s, e)).ToArray();
-            var pairs = new List<(Bot b1, Bot b2)>();
+            var bots = (from s in strategies from e in evaluators select s(e)).ToArray();
+            var pairs = new List<(IStrategy b1, IStrategy b2)>();
             for (var b1 = 0; b1 < bots.Length-1; b1++)
             {
                 for (var b2 = b1+1; b2 < bots.Length; b2++)

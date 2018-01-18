@@ -1,23 +1,26 @@
 using System;
 using Yeine.State;
+using Yeine.Strategies;
 
 namespace Yeine.Arena
 {
     public class Match
     {
+        private readonly IMoveEvaluator eval;
         private readonly int verbosity;
         public readonly Field CurrentField;
         private int currentRound;
         private bool isP1turn;
         public int Cells0;
         public int Cells1;
-        public readonly Bot P0;
-        public readonly Bot P1;
+        public readonly IStrategy P0;
+        public readonly IStrategy P1;
         public readonly Game S0;
         public readonly Game S1;
 
-        public Match(int verbosity, Field startingField, Bot player0, Bot player1)
+        public Match(int verbosity, Field startingField, IStrategy player0, IStrategy player1)
         {
+            this.eval = new OursMinusTheirs();
             this.verbosity = verbosity;
             this.CurrentField = startingField;
             this.currentRound = 1;
@@ -52,26 +55,26 @@ namespace Yeine.Arena
         {
             if (!isP1turn)
             {
-                var result = PlayTurn(P0.Strategy, P0.Evaluator, S0);
+                var result = PlayTurn(P0, S0);
                 isP1turn = true;
                 return result;
             }
             else
             {
-                var result = PlayTurn(P1.Strategy, P1.Evaluator, S1);
+                var result = PlayTurn(P1, S1);
                 isP1turn = false;
                 currentRound++;
                 return result;
             }
         }
 
-        public TurnResult PlayTurn(IStrategy strat, IEvaluator eval, Game state)
+        private TurnResult PlayTurn(IStrategy strat, Game state)
         {
             if (verbosity >= 2) Console.WriteLine(CurrentField.ToString());
             state.ParseField(CurrentField.Width, CurrentField.Height, CurrentField.ToString());
             state.RoundNumber = currentRound;
 
-            var m = strat.Act(state, eval);
+            var m = strat.Act(state);
             var v1 = eval.EvaluatePosition(state, CurrentField);
             CurrentField.ProcessCommand(m, state.OurID);
             CurrentField.UpdatePosition();

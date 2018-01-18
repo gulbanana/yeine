@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using Xunit;
 using Yeine.API;
-using Yeine.Evaluators;
 using Yeine.State;
 using Yeine.Strategies;
 
@@ -12,12 +11,10 @@ namespace Yeine.Test
     public class StrategyTests
     {
         private readonly Game state;
-        private readonly IEvaluator eval;
 
         public StrategyTests()
         {
             state = new Game();
-            eval = new OursMinusTheirs();
         }
 
         [Fact]
@@ -26,7 +23,7 @@ namespace Yeine.Test
             state.ParseField(2, 2, "0,0,1,.");
 
             var strat = new RandomMoves();
-            var move = strat.Act(state, eval);
+            var move = strat.Act(state);
 
             Assert.NotEqual(MoveType.Pass, move.Command);
         }
@@ -37,7 +34,7 @@ namespace Yeine.Test
             state.ParseField(1, 1, ".");
 
             var strat = new RandomMoves();
-            var move = strat.Act(state, eval);
+            var move = strat.Act(state);
 
             Assert.Equal(MoveType.Pass, move.Command);
         }
@@ -46,7 +43,7 @@ namespace Yeine.Test
         public void AlwaysPass_AlwaysPasses()
         {
             var strat = new AlwaysPass();
-            var move = strat.Act(state, eval);
+            var move = strat.Act(state);
 
             Assert.Equal(MoveType.Pass, move.Command);
         }
@@ -54,8 +51,8 @@ namespace Yeine.Test
         [Fact]
         public void BestMove_DoesntCrash()
         {
-            var strat = new BestMove(1, 4);
-            var move = strat.Act(state, eval);
+            var strat = new BestMove(new OursMinusTheirs(), 1, 4);
+            var move = strat.Act(state);
         }
     }
 }

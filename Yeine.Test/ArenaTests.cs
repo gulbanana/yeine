@@ -2,29 +2,26 @@ using System;
 using Xunit;
 using Yeine.API;
 using Yeine.Arena;
-using Yeine.Evaluators;
 using Yeine.State;
 
 namespace Yeine.Test
 {
     public class ArenaTests
     {
-        private class Repeater : IStrategy
+        private class Repeat : IStrategy
         {
             private readonly Move move;
-            public Repeater(Move move) => this.move = move;
-            public Move Act(Game state, IEvaluator evaluator) => move;
+            public Repeat(Move move) => this.move = move;
+            public Move Act(Game state) => move;
         }
-
-        private Bot Repeat(Move move) => new Bot(new Repeater(move), new OursMinusTheirs());
 
         [Fact]
         public void InitState()
         {
             var field = new Field(18, 16, ".,0,0,0,.,.,.,.,.,0,.,.,.,0,.,.,.,.,0,.,.,.,.,0,0,.,.,.,.,.,.,0,0,.,.,0,.,0,.,0,0,.,.,0,.,0,0,.,.,.,.,.,0,.,.,0,.,.,.,.,.,.,.,0,.,.,.,0,0,.,.,.,0,0,0,.,.,.,.,0,0,.,.,0,.,.,.,.,.,.,.,.,0,.,.,.,.,.,.,0,.,.,.,.,.,.,0,.,0,.,0,.,.,.,.,0,0,.,.,0,0,0,.,.,.,.,.,0,.,.,.,0,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,1,.,.,.,1,.,.,.,.,.,1,1,1,.,.,1,1,.,.,.,.,1,.,1,.,1,.,.,.,.,.,.,1,.,.,.,.,.,.,1,.,.,.,.,.,.,.,.,1,.,.,1,1,.,.,.,.,1,1,1,.,.,.,1,1,.,.,.,1,.,.,.,.,.,.,.,1,.,.,1,.,.,.,.,.,1,1,.,1,.,.,1,1,.,1,.,1,.,.,1,1,.,.,.,.,.,.,1,1,.,.,.,.,1,.,.,.,.,1,.,.,.,1,.,.,.,.,.,1,1,1,.");
             var match = new Match(0, field, 
-                Repeat(Move.Birth(new Point(6,7), new Point(3,0), new Point(9,0))), 
-                Repeat(Move.Pass())); 
+                new Repeat(Move.Birth(new Point(6,7), new Point(3,0), new Point(9,0))), 
+                new Repeat(Move.Pass())); 
 
             Assert.Equal('0', match.S0.OurID);
             Assert.Equal('1', match.S1.OurID);
@@ -35,11 +32,11 @@ namespace Yeine.Test
         {
             var field = new Field(18, 16, ".,0,0,0,.,.,.,.,.,0,.,.,.,0,.,.,.,.,0,.,.,.,.,0,0,.,.,.,.,.,.,0,0,.,.,0,.,0,.,0,0,.,.,0,.,0,0,.,.,.,.,.,0,.,.,0,.,.,.,.,.,.,.,0,.,.,.,0,0,.,.,.,0,0,0,.,.,.,.,0,0,.,.,0,.,.,.,.,.,.,.,.,0,.,.,.,.,.,.,0,.,.,.,.,.,.,0,.,0,.,0,.,.,.,.,0,0,.,.,0,0,0,.,.,.,.,.,0,.,.,.,0,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,1,.,.,.,1,.,.,.,.,.,1,1,1,.,.,1,1,.,.,.,.,1,.,1,.,1,.,.,.,.,.,.,1,.,.,.,.,.,.,1,.,.,.,.,.,.,.,.,1,.,.,1,1,.,.,.,.,1,1,1,.,.,.,1,1,.,.,.,1,.,.,.,.,.,.,.,1,.,.,1,.,.,.,.,.,1,1,.,1,.,.,1,1,.,1,.,1,.,.,1,1,.,.,.,.,.,.,1,1,.,.,.,.,1,.,.,.,.,1,.,.,.,1,.,.,.,.,.,1,1,1,.");
             var match = new Match(0, field, 
-                Repeat(Move.Birth(new Point(6,7), new Point(3,0), new Point(9,0))), 
-                Repeat(Move.Pass())); 
+                new Repeat(Move.Birth(new Point(6,7), new Point(3,0), new Point(9,0))), 
+                new Repeat(Move.Pass())); 
 
             
-            match.PlayTurn(match.P0.Strategy, match.P0.Evaluator, match.S0);
+            match.PlayTurn();
 
             Assert.Equal(44, match.Cells0);
             Assert.Equal(41, match.Cells1);
@@ -51,8 +48,8 @@ namespace Yeine.Test
         {
             var field = new Field(18, 16, ".,0,0,0,.,.,.,.,.,0,.,.,.,0,.,.,.,.,0,.,.,.,.,0,0,.,.,.,.,.,.,0,0,.,.,0,.,0,.,0,0,.,.,0,.,0,0,.,.,.,.,.,0,.,.,0,.,.,.,.,.,.,.,0,.,.,.,0,0,.,.,.,0,0,0,.,.,.,.,0,0,.,.,0,.,.,.,.,.,.,.,.,0,.,.,.,.,.,.,0,.,.,.,.,.,.,0,.,0,.,0,.,.,.,.,0,0,.,.,0,0,0,.,.,.,.,.,0,.,.,.,0,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,1,.,.,.,1,.,.,.,.,.,1,1,1,.,.,1,1,.,.,.,.,1,.,1,.,1,.,.,.,.,.,.,1,.,.,.,.,.,.,1,.,.,.,.,.,.,.,.,1,.,.,1,1,.,.,.,.,1,1,1,.,.,.,1,1,.,.,.,1,.,.,.,.,.,.,.,1,.,.,1,.,.,.,.,.,1,1,.,1,.,.,1,1,.,1,.,1,.,.,1,1,.,.,.,.,.,.,1,1,.,.,.,.,1,.,.,.,.,1,.,.,.,1,.,.,.,.,.,1,1,1,.");
             var match = new Match(0, field, 
-                Repeat(Move.Birth(new Point(6,7), new Point(3,0), new Point(9,0))), 
-                Repeat(Move.Birth(new Point(6,8), new Point(16,13), new Point(9,13))));
+                new Repeat(Move.Birth(new Point(6,7), new Point(3,0), new Point(9,0))), 
+                new Repeat(Move.Birth(new Point(6,8), new Point(16,13), new Point(9,13))));
 
             match.PlayTurn();
             match.PlayTurn();

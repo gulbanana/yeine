@@ -8,16 +8,18 @@ namespace Yeine.Strategies
     /// <summary>Kill the cell which has the greatest positive impact on gamestate</summary>
     public class BestMove : IStrategy
     {
+        private readonly IMoveEvaluator evaluator;
         private readonly int lookahead;
         private readonly int killDepth;
         
-        public BestMove(int lookahead, int killDepth)
+        public BestMove(IMoveEvaluator evaluator, int lookahead, int killDepth)
         {
+            this.evaluator = evaluator;
             this.lookahead = lookahead;
             this.killDepth = killDepth;
         }
 
-        public Move Act(Game state, IEvaluator evaluator)
+        public Move Act(Game state)
         {
             var basePosition = state.Field.Clone();
             for (var i = 0; i < lookahead; i++) basePosition.UpdatePosition();
@@ -112,6 +114,6 @@ namespace Yeine.Strategies
             }
         }
 
-        public override string ToString() => $"{nameof(BestMove)}(lookahead: {lookahead}, killDepth: {killDepth})";
+        public override string ToString() => $"{nameof(BestMove)}({evaluator}, look {lookahead}, kill {killDepth})";
     }
 }

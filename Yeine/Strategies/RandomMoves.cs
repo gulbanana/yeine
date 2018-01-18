@@ -19,7 +19,7 @@ namespace Yeine.Strategies
         public override string ToString() => nameof(RandomMoves);
 
         /// <summary>Performs a random Birth or Kill move (if possible)</summary>
-        public Move Act(Game state, IEvaluator evaluator)
+        public Move Act(Game state)
         {
             var cellMap = CreateMap(state);
 

@@ -1,12 +1,12 @@
 using Yeine.State;
 
-namespace Yeine.Evaluators
+namespace Yeine.Strategies
 {
-    public class RecogniseEnd : IEvaluator
+    public class RecogniseEnd : IMoveEvaluator
     {
-        private readonly IEvaluator inner;
+        private readonly IMoveEvaluator inner;
 
-        public RecogniseEnd(IEvaluator inner)
+        public RecogniseEnd(IMoveEvaluator inner)
         {
             this.inner = inner;
         }
@@ -30,6 +30,6 @@ namespace Yeine.Evaluators
             }
         }
 
-        public override string ToString() => $"{nameof(RecogniseEnd)}";
+        public override string ToString() => $"shortcut";
     }
 }

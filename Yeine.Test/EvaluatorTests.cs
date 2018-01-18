@@ -1,6 +1,6 @@
 using System;
 using Xunit;
-using Yeine.Evaluators;
+using Yeine.Strategies;
 using Yeine.State;
 
 namespace Yeine.Test
