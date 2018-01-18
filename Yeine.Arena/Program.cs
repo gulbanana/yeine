@@ -17,17 +17,13 @@ namespace Yeine.Arena
 
             var strategies = new IStrategy[]
             {
-                new Strategies.BestMove(2, 3),
-                new Strategies.BestMove(2, 4),
-                new Strategies.BestMove(2, 5),
-                new Strategies.BestMove(3, 3),
-                new Strategies.BestMove(3, 4),
+                new Strategies.BestMove(2, 2),
                 new Strategies.BestMove(3, 5),
             };
 
             var evaluators = new IEvaluator[]
             {
-                new Evaluators.RecogniseEnd(new Evaluators.OursMinusTheirs())
+                new Evaluators.OursMinusTheirs()
             };
 
             var bots = (from s in strategies from e in evaluators select new Bot(s, e)).ToArray();
