@@ -17,15 +17,20 @@ namespace Yeine.Arena
 
             var strategies = new Func<IMoveEvaluator, IStrategy>[]
             {
-                e => new Strategies.BestMove(e, 2, 2),
-                e => new Strategies.BestMove(e, 3, 2),
-                e => new Strategies.BestMove(e, 4, 2),
-                e => new Strategies.BestMove(e, 5, 2),
+                e => new Strategies.BestMove(e, 3, 3),
+                e => new Strategies.BestMove(e, 3, 4),
+                e => new Strategies.BestMove(e, 3, 5),
+                e => new Strategies.BestMove(e, 4, 3),
+                e => new Strategies.BestMove(e, 4, 4),
+                e => new Strategies.BestMove(e, 4, 5),
+                e => new Strategies.BestMove(e, 5, 3),
+                e => new Strategies.BestMove(e, 5, 4),
+                e => new Strategies.BestMove(e, 5, 5),
             };
 
             var evaluators = new IMoveEvaluator[]
             {
-                new Strategies.OursMinusTheirs(),
+                new Strategies.RecogniseEnd(new Strategies.OursMinusTheirs()),
             };
 
             var bots = (from s in strategies from e in evaluators select s(e)).ToArray();
