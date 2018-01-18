@@ -12,7 +12,7 @@ namespace Yeine
                 var eventLoop = new BotEventLoop(
                     new StreamReader(Console.OpenStandardInput(512)), 
                     Console.Out, 
-                    new Strategies.BestMove(2, 4),
+                    new Strategies.BestMove(2, 2),
                     new Evaluators.RecogniseEnd(new Evaluators.OursMinusTheirs()));
                     
                 eventLoop.Run();
