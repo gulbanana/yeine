@@ -54,7 +54,7 @@ namespace Yeine.Test
         [Fact]
         public void BestMove_DoesntCrash()
         {
-            var strat = new BestMove(1);
+            var strat = new BestMove(1, 4);
             var move = strat.Act(state, eval);
         }
     }

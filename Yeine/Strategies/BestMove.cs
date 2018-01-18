@@ -9,10 +9,12 @@ namespace Yeine.Strategies
     public class BestMove : IStrategy
     {
         private readonly int lookahead;
+        private readonly int killDepth;
         
-        public BestMove(int lookahead)
+        public BestMove(int lookahead, int killDepth)
         {
             this.lookahead = lookahead;
+            this.killDepth = killDepth;
         }
 
         public Move Act(Game state, IEvaluator evaluator)
@@ -58,7 +60,7 @@ namespace Yeine.Strategies
             var bestBirthTarget = default(Point);
             var bestBirthSac1 = default(Point);
             var bestBirthSac2 = default(Point);
-            var bestKillables = ownKillables.OrderByDescending(k => k.Value).Take(4).Select(k => k.Target).ToArray();
+            var bestKillables = ownKillables.OrderByDescending(k => k.Value).Take(killDepth).Select(k => k.Target).ToArray();
 
             for (var x = 0; x < state.Field.Width; x++)
             {
@@ -110,6 +112,6 @@ namespace Yeine.Strategies
             }
         }
 
-        public override string ToString() => $"{nameof(BestMove)}(lookahead: {lookahead})";
+        public override string ToString() => $"{nameof(BestMove)}(lookahead: {lookahead}, killDepth: {killDepth})";
     }
 }
