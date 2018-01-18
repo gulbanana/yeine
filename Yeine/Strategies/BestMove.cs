@@ -9,12 +9,10 @@ namespace Yeine.Strategies
     public class BestMove : IStrategy
     {
         private readonly int lookahead;
-        private readonly List<CostedMove> ownKillables;
         
         public BestMove(int lookahead)
         {
             this.lookahead = lookahead;
-            ownKillables = new List<CostedMove>();
         }
 
         public Move Act(Game state, IEvaluator evaluator)
@@ -25,7 +23,7 @@ namespace Yeine.Strategies
 
             var bestKillValue = 0;
             var bestKillTarget = default(Point);
-            ownKillables.Clear();
+            var ownKillables = new List<CostedMove>();
 
             for (var x = 0; x < state.Field.Width; x++)
             {
