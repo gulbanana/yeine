@@ -1,0 +1,21 @@
+{
+    \"wrapper\": {
+      \"timebankMax\": 10000,
+      \"timePerMove\": 100,
+      \"maxTimeouts\": 2,
+      \"resultFile\": \"./resultfile.json\",
+      \"propagateBotExitCode\": false,
+      \"debug\": false
+    },
+    \"match\": {
+      \"bots\": [{
+        \"command\": \"dotnet run -p ..\\Yeine\"
+      },{
+        \"command\": \"dotnet run -p ..\\Yeine\"
+      }],
+      \"engine\": {
+        \"command\": \"java -jar Golad-1.1.0.jar\",
+        \"configuration\": {}
+      }
+    }
+  }
