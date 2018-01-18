@@ -100,10 +100,11 @@ namespace Yeine.Arena
             {
                 state.ParseField(field.Width, field.Height, field.ToString());
                 var m = strat.Act(state, eval);
+                var v1 = eval.EvaluatePosition(state, field);
                 field.ProcessCommand(m, state.OurID);
                 field.UpdatePosition();
-                var v = eval.EvaluatePosition(state, field);
-                if (verbosity >= 2) Write($"Round {round}, player0 {m}, {(v>0 ? "+" : "")}{v}");
+                var v2 = eval.EvaluatePosition(state, field);
+                if (verbosity >= 2) Write($"Round {round}, {state.OurName} {m}, {(v1>0 ? "+" : "")}{v1}->{(v2>0 ? "+" : "")}{v2}");
 
                 field.EvaluateLivingCells('0', '1', out c0, out c1);
                 return c0 == 0 || c1 ==  0;
