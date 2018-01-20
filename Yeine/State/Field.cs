@@ -99,7 +99,7 @@ namespace Yeine.State
             return new Field(Width, Height, (char[,])Cells.Clone());
         }
 
-        public void EvaluateLivingCells(char us, char them, out int ours, out int theirs)
+        public void Evaluate(char us, char them, out int ours, out int theirs)
         {
             evaluations++;
 
@@ -122,7 +122,7 @@ namespace Yeine.State
             }
         }
 
-        public void UpdatePosition()
+        public void Simulate()
         {
             updates++;
 

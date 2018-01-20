@@ -111,7 +111,7 @@ namespace Yeine.Strategies
 
             for (var i = 0; i < lookahead; i++)
             {
-                position.UpdatePosition();
+                position.Simulate();
             }
 
             return EvaluatePosition(state, position, evaluationShortcuts);
@@ -122,7 +122,7 @@ namespace Yeine.Strategies
             var ours = 0;
             var theirs = 0;
 
-            position.EvaluateLivingCells(state.OurID, state.TheirID, out ours, out theirs);
+            position.Evaluate(state.OurID, state.TheirID, out ours, out theirs);
 
             if (shortcuts)
             {

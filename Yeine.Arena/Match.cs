@@ -31,7 +31,7 @@ namespace Yeine.Arena
         public GameResult PlayGame()
         {
             if (verbosity >= 1) Console.WriteLine($"==== {P0} vs {P1} ====");
-            CurrentField.EvaluateLivingCells('0', '1', out Cells0, out Cells1);
+            CurrentField.Evaluate('0', '1', out Cells0, out Cells1);
 
             while (currentRound <= 100)
             {
@@ -75,11 +75,11 @@ namespace Yeine.Arena
             var m = strat.Act(state);
             var v1 = EvaluatePosition(state, CurrentField);
             CurrentField.ProcessCommand(m, state.OurID);
-            CurrentField.UpdatePosition();
+            CurrentField.Simulate();
             var v2 = EvaluatePosition(state, CurrentField);
             if (verbosity >= 2) Console.WriteLine($"Round {currentRound}, {state.OurName} {m}, {(v1>0 ? "+" : "")}{v1}->{(v2>0 ? "+" : "")}{v2}");
 
-            CurrentField.EvaluateLivingCells('0', '1', out Cells0, out Cells1);
+            CurrentField.Evaluate('0', '1', out Cells0, out Cells1);
             return (Cells0 == 0 || Cells1 == 0) ? TurnResult.GameOver : TurnResult.Continue;
         }
         
@@ -88,7 +88,7 @@ namespace Yeine.Arena
             var ours = 0;
             var theirs = 0;
 
-            position.EvaluateLivingCells(state.OurID, state.TheirID, out ours, out theirs);
+            position.Evaluate(state.OurID, state.TheirID, out ours, out theirs);
 
             return ours - theirs;
         }

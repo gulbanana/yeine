@@ -11,7 +11,7 @@ namespace Yeine.Test
         {
             var f = new Field(3, 3, ".,.,.,.,.,.,.,.,.");
 
-            f.UpdatePosition();
+            f.Simulate();
 
             Assert.Equal(".,.,.,.,.,.,.,.,.", f.ToString());
         }
@@ -21,7 +21,7 @@ namespace Yeine.Test
         {
             var f = new Field(3, 3, ".,.,.,.,0,.,.,.,.");
 
-            f.UpdatePosition();
+            f.Simulate();
 
             Assert.Equal(".,.,.,.,.,.,.,.,.", f.ToString());
         }
@@ -31,7 +31,7 @@ namespace Yeine.Test
         {
             var f = new Field(3, 3, ".,.,.,.,0,0,.,.,.");
 
-            f.UpdatePosition();
+            f.Simulate();
 
             Assert.Equal(".,.,.,.,.,.,.,.,.", f.ToString());
         }
@@ -41,7 +41,7 @@ namespace Yeine.Test
         {
             var f = new Field(3, 3, ".,0,.,.,0,0,.,.,.");
 
-            f.UpdatePosition();
+            f.Simulate();
 
             Assert.Equal(".,0,0,.,0,0,.,.,.", f.ToString());
         }
@@ -51,7 +51,7 @@ namespace Yeine.Test
         {
             var f = new Field(3, 3, ".,0,0,.,0,0,.,.,.");
 
-            f.UpdatePosition();
+            f.Simulate();
 
             Assert.Equal(".,0,0,.,0,0,.,.,.", f.ToString());
         }
@@ -61,7 +61,7 @@ namespace Yeine.Test
         {
             var f = new Field(3, 3, ".,1,.,.,0,0,.,.,.");
 
-            f.UpdatePosition();
+            f.Simulate();
 
             Assert.Equal(".,1,0,.,0,0,.,.,.", f.ToString());
         }
@@ -71,7 +71,7 @@ namespace Yeine.Test
         {
             var f = new Field(3, 3, ".,0,.,.,1,1,.,.,.");
 
-            f.UpdatePosition();
+            f.Simulate();
 
             Assert.Equal(".,0,1,.,1,1,.,.,.", f.ToString());
         }
@@ -81,7 +81,7 @@ namespace Yeine.Test
         {
             var f = new Field(3, 3, ".,1,.,.,1,1,.,.,.");
 
-            f.UpdatePosition();
+            f.Simulate();
 
             Assert.Equal(".,1,1,.,1,1,.,.,.", f.ToString());
         }
@@ -107,7 +107,7 @@ namespace Yeine.Test
                 "1,.,.,1,1,.,.,.,.,.,.,1,1,.,.,.,.,1," + 
                 ".,.,.,.,1,.,.,.,1,.,.,.,.,.,1,1,1,.");
 
-            f.UpdatePosition();
+            f.Simulate();
 
             Assert.Equal(
                 ".,0,.,.,.,.,.,.,.,.,.,.,.,0,0,.,.,.," +
