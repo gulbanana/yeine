@@ -87,8 +87,6 @@ namespace Yeine.Strategies
                 }
             }
 
-            //state.Log(Field.ReportStats());
-
             if (bestBirthValue > bestKillValue)
             {
                 return Move.Birth(bestBirthTarget, bestBirthSac1, bestBirthSac2);
