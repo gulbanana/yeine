@@ -11,7 +11,7 @@ namespace Yeine.Arena
     {
         static void Main(string[] args)
         {
-            var count = args.SingleOrDefault(a => int.TryParse(a, out _)) ?? "1";
+            var count = args.SingleOrDefault(a => int.TryParse(a, out _)) ?? "2";
             var isVerbose = args.Any(a => a == "-v" || a == "--verbose");
             var isVeryVerbose = args.Any(a => a == "-vv" || a == "--veryVerbose");
 
