@@ -133,31 +133,20 @@ namespace Yeine.State
             {
                 for (var y = 0; y < Height; y++)
                 {
-                    if (Cells[x,y] == '0')
+                    if (Cells[x,y] != '.')
                     {
-                        if (x > 0 && y > 0) neighbours[0, x-1, y-1]++;
-                        if (y > 0) neighbours[0, x, y-1]++;
-                        if (x < Width-1 && y > 0) neighbours[0, x+1, y-1]++;
+                        var p = Cells[x,y] - '0';
 
-                        if (x > 0) neighbours[0, x-1, y]++;
-                        if (x < Width-1) neighbours[0, x+1, y]++;
+                        if (x > 0 && y > 0) neighbours[p, x-1, y-1]++;
+                        if (y > 0) neighbours[p, x, y-1]++;
+                        if (x < Width-1 && y > 0) neighbours[p, x+1, y-1]++;
 
-                        if (x > 0 && y < Height-1) neighbours[0, x-1, y+1]++;
-                        if (y < Height-1) neighbours[0, x, y+1]++;
-                        if (x < Width-1 && y < Height-1) neighbours[0, x+1, y+1]++;
-                    }
-                    else if (Cells[x,y] == '1')
-                    {
-                        if (x > 0 && y > 0) neighbours[1, x-1, y-1]++;
-                        if (y > 0) neighbours[1, x, y-1]++;
-                        if (x < Width-1 && y > 0) neighbours[1, x+1, y-1]++;
+                        if (x > 0) neighbours[p, x-1, y]++;
+                        if (x < Width-1) neighbours[p, x+1, y]++;
 
-                        if (x > 0) neighbours[1, x-1, y]++;
-                        if (x < Width-1) neighbours[1, x+1, y]++;
-
-                        if (x > 0 && y < Height-1) neighbours[1, x-1, y+1]++;
-                        if (y < Height-1) neighbours[1, x, y+1]++;
-                        if (x < Width-1 && y < Height-1) neighbours[1, x+1, y+1]++;
+                        if (x > 0 && y < Height-1) neighbours[p, x-1, y+1]++;
+                        if (y < Height-1) neighbours[p, x, y+1]++;
+                        if (x < Width-1 && y < Height-1) neighbours[p, x+1, y+1]++;
                     }
                 }
             }
