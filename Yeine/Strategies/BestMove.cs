@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Yeine.API;
@@ -21,13 +22,11 @@ namespace Yeine.Strategies
 
         public Move Act(Game state)
         {
-            var basePosition = state.Field.Clone();
-            for (var i = 0; i < lookahead; i++) basePosition.UpdatePosition();
-            var baseValue = EvaluatePosition(state, basePosition, evaluationShortcuts);
+            var passValue = Lookahead(state, _ => {});
 
             var bestKillValue = 0;
             var bestKillTarget = default(Point);
-            var ownKillables = new List<CostedMove>();
+            var bestKillables = new List<CostedMove>();
 
             for (var x = 0; x < state.Field.Width; x++)
             {
@@ -35,24 +34,17 @@ namespace Yeine.Strategies
                 {
                     if (state.Field.Cells[x,y] != '.')
                     {
-                        var simField = state.Field.Clone();                        
-                        simField.Cells[x,y] = '.';
+                        var killValue = Lookahead(state, f => f.Cells[x,y] = '.') - passValue;
 
-                        for (var i = 0; i < lookahead; i++) 
+                        if (killValue > bestKillValue)
                         {
-                            simField.UpdatePosition();
-                        }
-                        var simValue = EvaluatePosition(state, simField, evaluationShortcuts) - baseValue;
-
-                        if (simValue > bestKillValue)
-                        {
-                            bestKillValue = simValue;
+                            bestKillValue = killValue;
                             bestKillTarget = new Point(x, y);
                         }
 
                         if (state.Field.Cells[x,y] == state.OurID)
                         {
-                            ownKillables.Add(new CostedMove { Value = simValue, Target = new Point(x, y)});
+                            bestKillables.Add(new CostedMove { Value = killValue, Target = new Point(x, y)});
                         }
                     }
                 }
@@ -62,7 +54,7 @@ namespace Yeine.Strategies
             var bestBirthTarget = default(Point);
             var bestBirthSac1 = default(Point);
             var bestBirthSac2 = default(Point);
-            var bestKillables = ownKillables.OrderByDescending(k => k.Value).Take(sacrificeOptions).Select(k => k.Target).ToArray();
+            var sacrifices = bestKillables.OrderByDescending(k => k.Value).Take(sacrificeOptions).Select(k => k.Target).ToArray();
 
             for (var x = 0; x < state.Field.Width; x++)
             {
@@ -71,26 +63,23 @@ namespace Yeine.Strategies
                     if (state.Field.Cells[x,y] == '.')
                     {
                         // potential birth target. try each combo of own-killables
-                        for (var s1 = 0; s1 < bestKillables.Length - 1; s1++)
+                        for (var s1 = 0; s1 < sacrifices.Length - 1; s1++)
                         {
-                            for (var s2 = s1+1; s2 < bestKillables.Length; s2++)
+                            for (var s2 = s1+1; s2 < sacrifices.Length; s2++)
                             {
-                                var simField = state.Field.Clone();
-
-                                simField.Cells[x,y] = state.OurID;
-                                simField.Cells[bestKillables[s1].X,bestKillables[s1].Y] = '.';
-                                simField.Cells[bestKillables[s2].X,bestKillables[s2].Y] = '.';
-
-                                for (var i = 0; i < lookahead; i++) simField.UpdatePosition();
-
-                                var simValue = EvaluatePosition(state, simField, evaluationShortcuts) - baseValue;
-
-                                if (simValue > bestBirthValue)
+                                var birthValue = Lookahead(state, f =>
                                 {
-                                    bestBirthValue = simValue;
+                                    f.Cells[x,y] = state.OurID;
+                                    f.Cells[sacrifices[s1].X,sacrifices[s1].Y] = '.';
+                                    f.Cells[sacrifices[s2].X,sacrifices[s2].Y] = '.';
+                                }) - passValue;
+
+                                if (birthValue > bestBirthValue)
+                                {
+                                    bestBirthValue = birthValue;
                                     bestBirthTarget = new Point(x, y);
-                                    bestBirthSac1 = bestKillables[s1];
-                                    bestBirthSac2 = bestKillables[s2];
+                                    bestBirthSac1 = sacrifices[s1];
+                                    bestBirthSac2 = sacrifices[s2];
                                 }
                             }
                         }
@@ -112,6 +101,20 @@ namespace Yeine.Strategies
             {
                 return Move.Pass();
             }
+        }
+
+        private int Lookahead(Game state, Action<Field> f)
+        {
+            var position = state.Field.Clone();
+            
+            f(position);
+
+            for (var i = 0; i < lookahead; i++)
+            {
+                position.UpdatePosition();
+            }
+
+            return EvaluatePosition(state, position, evaluationShortcuts);
         }
 
         public static int EvaluatePosition(Game state, Field position, bool shortcuts)
