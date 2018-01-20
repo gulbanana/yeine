@@ -44,18 +44,28 @@ namespace Yeine.Arena
                 Console.WriteLine($"{p0} vs {p1}, {games} games: {w}W / {l}L / {d}D ({w*100/games}% / {l*100/games}% / {d*100/games}%).");
 
                 results[pair.b1, pair.b2] = (w, l, d);
-                results[pair.b2, pair.b1] = (w, l, d);
+                results[pair.b2, pair.b1] = (l, w, d);
             }
 
+            WriteCSV("wins", bots, results, games, (b1, b2) => results[b1, b2].w );
+            WriteCSV("losses", bots, results, games, (b1, b2) => results[b1, b2].l);
+            WriteCSV("draws", bots, results, games, (b1, b2) => results[b1, b2].d);
+            WriteCSV("net", bots, results, games, (b1, b2) => results[b1, b2].w - results[b1, b2].l);
+        }
+
+        private static void WriteCSV(string name, IStrategy[] bots, (int w, int l, int d)[,] results, int total, Func<int, int, int> transitive)
+        {
             var csv = new StringBuilder();
+
             csv.AppendLine("\"player0\"," + string.Join(",", bots.Select(s => $"\"vs {s}\"")));
+
             for (var b1 = 0; b1 < bots.Length; b1++)
             {
                 var botResults = Enumerable.Range(0, bots.Length).Select(b2 => b1 == b2 ? "\"0\"" : $"\"{results[b1, b2].w - results[b1, b2].l}\"");
                 csv.AppendLine($"\"{bots[b1]}\"," + string.Join(",", botResults));
             }
 
-            File.WriteAllText($"arena-{bots.Length}players-{games}games.csv", csv.ToString());
+            File.WriteAllText($"arena-{DateTime.Now}-{name}.csv", csv.ToString());
         }
     }
 }
