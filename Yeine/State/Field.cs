@@ -136,17 +136,25 @@ namespace Yeine.State
                     if (Cells[x,y] != '.')
                     {
                         var p = Cells[x,y] - '0';
+                        var notLeft = x > 0;
+                        var notRight = x < Width - 1;
 
-                        if (x > 0 && y > 0) neighbours[p, x-1, y-1]++;
-                        if (y > 0) neighbours[p, x, y-1]++;
-                        if (x < Width-1 && y > 0) neighbours[p, x+1, y-1]++;
+                        if (notLeft) neighbours[p, x-1, y]++;
+                        if (notRight) neighbours[p, x+1, y]++;
 
-                        if (x > 0) neighbours[p, x-1, y]++;
-                        if (x < Width-1) neighbours[p, x+1, y]++;
+                        if (y > 0)
+                        {
+                            neighbours[p, x, y-1]++;
+                            if (notLeft) neighbours[p, x-1, y-1]++;
+                            if (notRight) neighbours[p, x+1, y-1]++;
+                        }
 
-                        if (x > 0 && y < Height-1) neighbours[p, x-1, y+1]++;
-                        if (y < Height-1) neighbours[p, x, y+1]++;
-                        if (x < Width-1 && y < Height-1) neighbours[p, x+1, y+1]++;
+                        if (y < Height-1)
+                        {
+                            neighbours[p, x, y+1]++;
+                            if (notLeft) neighbours[p, x-1, y+1]++;
+                            if (notRight) neighbours[p, x+1, y+1]++;
+                        }
                     }
                 }
             }
