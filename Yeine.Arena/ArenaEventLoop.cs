@@ -26,24 +26,13 @@ namespace Yeine.Arena
             random = new Random();
         }
 
-        public void PlayGames(int games, bool parallel)
+        public (int w, int l, int d) PlayGames(int games)
         {
             var pairs = games / 2;
 
-            if (parallel)
-            {
-                Parallel.For(0, pairs, _ => PlayPair());
-            }
-            else
-            {
-                for (var i = 0; i < pairs; i++)
-                {
-                    PlayPair();
-                }
-            }
+            Parallel.For(0, pairs, _ => PlayPair());
 
-            var played = pairs*2;
-            Console.WriteLine($"{p0} vs {p1}, {played} games: {p0Wins}W / {p1Wins}L / {draws}D ({p0Wins*100/played}% / {p1Wins*100/played}% / {draws*100/played}%).");
+            return (p0Wins, p1Wins, draws);
         }
 
         private void PlayPair()

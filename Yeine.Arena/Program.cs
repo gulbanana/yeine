@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Yeine.Strategies;
 
@@ -15,26 +16,46 @@ namespace Yeine.Arena
             var isVerbose = args.Any(a => a == "-v" || a == "--verbose");
             var isVeryVerbose = args.Any(a => a == "-vv" || a == "--veryVerbose");
 
-            var strategies = new IStrategy[]
+            var bots = new IStrategy[]
             {
                 new Strategies.BestMove(3, 4),
                 new Strategies.BestMove(4, 5),
             };
 
-            var pairs = new List<(IStrategy b1, IStrategy b2)>();
-            for (var b1 = 0; b1 < strategies.Length-1; b1++)
+            var pairs = new List<(int b1,int b2)>();
+            for (var b1 = 0; b1 < bots.Length-1; b1++)
             {
-                for (var b2 = b1+1; b2 < strategies.Length; b2++)
+                for (var b2 = b1+1; b2 < bots.Length; b2++)
                 {
-                    pairs.Add((strategies[b1], strategies[b2]));
+                    pairs.Add((b1, b2));
                 }
             }
 
-            Parallel.ForEach(pairs, pair =>
+            var results = new (int w, int l, int d)[bots.Length,bots.Length];
+
+            var games = int.Parse(count);
+            foreach (var pair in pairs)
             {
-                var eventLoop = new ArenaEventLoop(isVeryVerbose ? 2 : isVerbose ? 1 : 0, pair.b1, pair.b2);
-                eventLoop.PlayGames(int.Parse(count), pairs.Count == 1);
-            });
+                var p0 = bots[pair.b1];
+                var p1 = bots[pair.b2];
+                var eventLoop = new ArenaEventLoop(isVeryVerbose ? 2 : isVerbose ? 1 : 0, p0, p1);
+                var (w, l, d) = eventLoop.PlayGames(games);
+                
+                Console.WriteLine($"{p0} vs {p1}, {games} games: {w}W / {l}L / {d}D ({w*100/games}% / {l*100/games}% / {d*100/games}%).");
+
+                results[pair.b1, pair.b2] = (w, l, d);
+                results[pair.b2, pair.b1] = (w, l, d);
+            }
+
+            var csv = new StringBuilder();
+            csv.AppendLine("\"player0\"," + string.Join(",", bots.Select(s => $"\"vs {s}\"")));
+            for (var b1 = 0; b1 < bots.Length; b1++)
+            {
+                var botResults = Enumerable.Range(0, bots.Length).Select(b2 => b1 == b2 ? "\"0\"" : $"\"{results[b1, b2].w - results[b1, b2].l}\"");
+                csv.AppendLine($"\"{bots[b1]}\"," + string.Join(",", botResults));
+            }
+
+            File.WriteAllText($"arena-{bots.Length}players-{games}games.csv", csv.ToString());
         }
     }
 }
