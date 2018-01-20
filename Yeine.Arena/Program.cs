@@ -38,8 +38,8 @@ namespace Yeine.Arena
 
             Parallel.ForEach(pairs, pair =>
             {
-                var eventLoop = new ArenaEventLoop(isVeryVerbose ? 2 : isVerbose ? 1 : 0, pairs.Count == 1, pair.b1, pair.b2);
-                eventLoop.Run(int.Parse(count));
+                var eventLoop = new ArenaEventLoop(isVeryVerbose ? 2 : isVerbose ? 1 : 0, pair.b1, pair.b2);
+                eventLoop.PlayGames(int.Parse(count), pairs.Count == 1);
             });
         }
     }

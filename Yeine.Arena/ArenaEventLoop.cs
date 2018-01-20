@@ -11,75 +11,60 @@ namespace Yeine.Arena
     class ArenaEventLoop
     {        
         private readonly int verbosity;
-        private readonly bool runParallel;
         private readonly IStrategy p0;
         private readonly IStrategy p1;
         private readonly Random random;
+        private int p0Wins = 0;
+        private int p1Wins = 0;
+        private int draws = 0;
 
-        public ArenaEventLoop(int verbosity, bool runParallel, IStrategy p0, IStrategy p1)
+        public ArenaEventLoop(int verbosity, IStrategy p0, IStrategy p1)
         {
             this.verbosity = verbosity;
-            this.runParallel = runParallel;
             this.p0 = p0;
             this.p1 = p1;
             random = new Random();
         }
 
-        public void Run(int games)
+        public void PlayGames(int games, bool parallel)
         {
-            int p0Wins = 0;
-            int p1Wins = 0;
-            int draws = 0;
+            var pairs = games / 2;
 
-            if (runParallel)
+            if (parallel)
             {
-                Parallel.For(0, games, _ =>
-                {
-                    var startingField = CreateRandomField(18, 16);
-                    
-                    var match1 = new Match(verbosity, startingField.Clone(), p0, p1);
-                    switch (match1.PlayGame())
-                    {
-                        case GameResult.Player0Win: Interlocked.Increment(ref p0Wins); break;
-                        case GameResult.Player1Win: Interlocked.Increment(ref p1Wins); break;
-                        case GameResult.Draw: Interlocked.Increment(ref draws); break;
-                    }
-                    
-                    var match2 = new Match(verbosity, startingField.Clone(), p1, p0);
-                    switch (match2.PlayGame())
-                    {
-                        case GameResult.Player0Win: Interlocked.Increment(ref p1Wins); break;
-                        case GameResult.Player1Win: Interlocked.Increment(ref p0Wins); break;
-                        case GameResult.Draw: Interlocked.Increment(ref draws); break;
-                    }
-                });
+                Parallel.For(0, pairs, _ => PlayPair());
             }
             else
             {
-                for (var i = 0; i < games; i++)
+                for (var i = 0; i < pairs; i++)
                 {
-                    var startingField = CreateRandomField(18, 16);
-                    
-                    var match1 = new Match(verbosity, startingField.Clone(), p0, p1);
-                    switch (match1.PlayGame())
-                    {
-                        case GameResult.Player0Win: p0Wins++; break;
-                        case GameResult.Player1Win: p1Wins++; break;
-                        case GameResult.Draw: draws++; break;
-                    }
-                    
-                    var match2 = new Match(verbosity, startingField.Clone(), p1, p0);
-                    switch (match2.PlayGame())
-                    {
-                        case GameResult.Player0Win: p1Wins++; break;
-                        case GameResult.Player1Win: p0Wins++; break;
-                        case GameResult.Draw: draws++; break;
-                    }
+                    PlayPair();
                 }
             }
 
-            var played = games*2;
+            var played = pairs*2;
             Console.WriteLine($"{p0} vs {p1}, {played} games: {p0Wins}W / {p1Wins}L / {draws}D ({p0Wins*100/played}% / {p1Wins*100/played}% / {draws*100/played}%).");
+        }
+
+        private void PlayPair()
+        {
+            var startingField = CreateRandomField(18, 16);
+                
+            var match1 = new Match(verbosity, startingField.Clone(), p0, p1);
+            switch (match1.PlayGame())
+            {
+                case GameResult.Player0Win: Interlocked.Increment(ref p0Wins); break;
+                case GameResult.Player1Win: Interlocked.Increment(ref p1Wins); break;
+                case GameResult.Draw: Interlocked.Increment(ref draws); break;
+            }
+            
+            var match2 = new Match(verbosity, startingField.Clone(), p1, p0);
+            switch (match2.PlayGame())
+            {
+                case GameResult.Player0Win: Interlocked.Increment(ref p1Wins); break;
+                case GameResult.Player1Win: Interlocked.Increment(ref p0Wins); break;
+                case GameResult.Draw: Interlocked.Increment(ref draws); break;
+            }
         }
 
         private Field CreateRandomField(int w, int h)
