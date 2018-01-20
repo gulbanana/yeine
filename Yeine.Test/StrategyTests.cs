@@ -51,8 +51,21 @@ namespace Yeine.Test
         [Fact]
         public void BestMove_DoesntCrash()
         {
-            var strat = new BestMove(new OursMinusTheirs(), 1, 4);
+            var strat = new BestMove(1, 4);
             var move = strat.Act(state);
+        }
+
+        [Theory]
+        [InlineData(1, 1, ".", 0)]
+        [InlineData(1, 1, "0", 1)]
+        [InlineData(1, 1, "1", -1)]
+        [InlineData(3, 3, "0,0,.,0,.,.,.,.,1", 2)]
+        public void BestMove_CellDifferenceCount(int w, int h, string cells, int result)
+        {
+            var f = new Field(w, h, cells);
+            var g = new Game();
+
+            Assert.Equal(result, BestMove.EvaluatePosition(g, f, false));
         }
     }
 }

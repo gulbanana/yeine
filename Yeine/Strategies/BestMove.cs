@@ -8,22 +8,22 @@ namespace Yeine.Strategies
     /// <summary>Kill the cell which has the greatest positive impact on gamestate</summary>
     public class BestMove : IStrategy
     {
-        private readonly IMoveEvaluator evaluator;
         private readonly int lookahead;
-        private readonly int killDepth;
-        
-        public BestMove(IMoveEvaluator evaluator, int lookahead, int killDepth)
+        private readonly int sacrificeOptions;
+        private readonly bool evaluationShortcuts;
+
+        public BestMove(int lookahead = 4, int sacrificeOptions = 5, bool evaluationShortcuts = true)
         {
-            this.evaluator = evaluator;
             this.lookahead = lookahead;
-            this.killDepth = killDepth;
+            this.sacrificeOptions = sacrificeOptions;
+            this.evaluationShortcuts = true;
         }
 
         public Move Act(Game state)
         {
             var basePosition = state.Field.Clone();
             for (var i = 0; i < lookahead; i++) basePosition.UpdatePosition();
-            var baseValue = evaluator.EvaluatePosition(state, basePosition);
+            var baseValue = EvaluatePosition(state, basePosition, evaluationShortcuts);
 
             var bestKillValue = 0;
             var bestKillTarget = default(Point);
@@ -42,7 +42,7 @@ namespace Yeine.Strategies
                         {
                             simField.UpdatePosition();
                         }
-                        var simValue = evaluator.EvaluatePosition(state, simField) - baseValue;
+                        var simValue = EvaluatePosition(state, simField, evaluationShortcuts) - baseValue;
 
                         if (simValue > bestKillValue)
                         {
@@ -62,7 +62,7 @@ namespace Yeine.Strategies
             var bestBirthTarget = default(Point);
             var bestBirthSac1 = default(Point);
             var bestBirthSac2 = default(Point);
-            var bestKillables = ownKillables.OrderByDescending(k => k.Value).Take(killDepth).Select(k => k.Target).ToArray();
+            var bestKillables = ownKillables.OrderByDescending(k => k.Value).Take(sacrificeOptions).Select(k => k.Target).ToArray();
 
             for (var x = 0; x < state.Field.Width; x++)
             {
@@ -83,7 +83,7 @@ namespace Yeine.Strategies
 
                                 for (var i = 0; i < lookahead; i++) simField.UpdatePosition();
 
-                                var simValue = evaluator.EvaluatePosition(state, simField) - baseValue;
+                                var simValue = EvaluatePosition(state, simField, evaluationShortcuts) - baseValue;
 
                                 if (simValue > bestBirthValue)
                                 {
@@ -114,6 +114,24 @@ namespace Yeine.Strategies
             }
         }
 
-        public override string ToString() => $"{nameof(BestMove)}({evaluator}, look {lookahead}, kill {killDepth})";
+        public static int EvaluatePosition(Game state, Field position, bool shortcuts)
+        {
+            var ours = 0;
+            var theirs = 0;
+
+            position.EvaluateLivingCells(state.OurID, state.TheirID, out ours, out theirs);
+
+            if (shortcuts)
+            {
+                if (ours == 0) return int.MinValue;
+                if (theirs == 0) return int.MaxValue;
+            }
+
+            return ours - theirs;
+        }
+
+        public override string ToString() => $"{nameof(BestMove)}(look {lookahead}, sac {sacrificeOptions}, {PlusMinus(evaluationShortcuts)}s)";
+
+        private char PlusMinus(bool b) => b ? '+' : '-';
     }
 }

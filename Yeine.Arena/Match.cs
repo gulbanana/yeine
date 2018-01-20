@@ -6,7 +6,6 @@ namespace Yeine.Arena
 {
     public class Match
     {
-        private readonly IMoveEvaluator eval;
         private readonly int verbosity;
         public readonly Field CurrentField;
         private int currentRound;
@@ -20,7 +19,6 @@ namespace Yeine.Arena
 
         public Match(int verbosity, Field startingField, IStrategy player0, IStrategy player1)
         {
-            this.eval = new OursMinusTheirs();
             this.verbosity = verbosity;
             this.CurrentField = startingField;
             this.currentRound = 1;
@@ -75,14 +73,24 @@ namespace Yeine.Arena
             state.RoundNumber = currentRound;
 
             var m = strat.Act(state);
-            var v1 = eval.EvaluatePosition(state, CurrentField);
+            var v1 = EvaluatePosition(state, CurrentField);
             CurrentField.ProcessCommand(m, state.OurID);
             CurrentField.UpdatePosition();
-            var v2 = eval.EvaluatePosition(state, CurrentField);
+            var v2 = EvaluatePosition(state, CurrentField);
             if (verbosity >= 2) Console.WriteLine($"Round {currentRound}, {state.OurName} {m}, {(v1>0 ? "+" : "")}{v1}->{(v2>0 ? "+" : "")}{v2}");
 
             CurrentField.EvaluateLivingCells('0', '1', out Cells0, out Cells1);
             return (Cells0 == 0 || Cells1 == 0) ? TurnResult.GameOver : TurnResult.Continue;
+        }
+        
+        private int EvaluatePosition(Game state, Field position)
+        {
+            var ours = 0;
+            var theirs = 0;
+
+            position.EvaluateLivingCells(state.OurID, state.TheirID, out ours, out theirs);
+
+            return ours - theirs;
         }
     }
 }
