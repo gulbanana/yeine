@@ -8,7 +8,6 @@ namespace Yeine.Bench
         {
             BenchmarkRunner.Run<ParameterComparison>();
             BenchmarkRunner.Run<TurnComponents>();
-            BenchmarkRunner.Run<EvaluationOptions>();
         }
     }
 }

@@ -18,8 +18,16 @@ namespace Yeine.Arena
 
             var bots = new IStrategy[]
             {
-                new Strategies.BestMove(3, 4),
-                new Strategies.BestMove(4, 5),
+                new Strategies.BestMove(4, 5, 0.000, 0.000),
+                new Strategies.BestMove(4, 5, 0.005, 0.000, 0),
+                new Strategies.BestMove(4, 5, 0.005, 0.000, 10),
+                new Strategies.BestMove(4, 5, 0.005, 0.000, 30),
+                new Strategies.BestMove(4, 5, 0.000, 0.005, 0),
+                new Strategies.BestMove(4, 5, 0.000, 0.005, 10),
+                new Strategies.BestMove(4, 5, 0.000, 0.005, 30),
+                new Strategies.BestMove(4, 5, 0.005, 0.005, 0),
+                new Strategies.BestMove(4, 5, 0.005, 0.005, 10),
+                new Strategies.BestMove(4, 5, 0.005, 0.005, 30),
             };
 
             var pairs = new List<(int b1,int b2)>();
@@ -51,21 +59,24 @@ namespace Yeine.Arena
             WriteCSV("losses", bots, results, games, (b1, b2) => results[b1, b2].l);
             WriteCSV("draws", bots, results, games, (b1, b2) => results[b1, b2].d);
             WriteCSV("net", bots, results, games, (b1, b2) => results[b1, b2].w - results[b1, b2].l);
+            WriteCSV("full", bots, results, games, (b1, b2) => results[b1, b2].w, (b1, b2) => results[b1, b2].l, (b1, b2) => results[b1, b2].d);
         }
 
-        private static void WriteCSV(string name, IStrategy[] bots, (int w, int l, int d)[,] results, int total, Func<int, int, int> transitive)
+        private static void WriteCSV(string name, IStrategy[] bots, (int w, int l, int d)[,] results, int total, params Func<int, int, int>[] fs)
         {
             var csv = new StringBuilder();
 
-            csv.AppendLine("\"player0\"," + string.Join(",", bots.Select(s => $"\"vs {s}\"")));
-
-            for (var b1 = 0; b1 < bots.Length; b1++)
+            foreach (var f in fs)
             {
-                var botResults = Enumerable.Range(0, bots.Length).Select(b2 => b1 == b2 ? "\"0\"" : $"\"{results[b1, b2].w - results[b1, b2].l}\"");
-                csv.AppendLine($"\"{bots[b1]}\"," + string.Join(",", botResults));
+                csv.AppendLine("\"player0\"," + string.Join(",", bots.Select(s => $"\"vs {s}\"")));
+                for (var b1 = 0; b1 < bots.Length; b1++)
+                {   
+                    var botResults = Enumerable.Range(0, bots.Length).Select(b2 => b1 == b2 ? "\"0\"" : $"\"{f(b1, b2)}\"");
+                    csv.AppendLine($"\"{bots[b1]}\"," + string.Join(",", botResults));
+                }
             }
 
-            File.WriteAllText($"arena-{DateTime.Now}-{name}.csv", csv.ToString());
+            File.WriteAllText($"arena-{bots.Length}x{total}-{name}.csv", csv.ToString());
         }
     }
 }

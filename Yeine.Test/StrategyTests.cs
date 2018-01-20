@@ -65,7 +65,7 @@ namespace Yeine.Test
             var f = new Field(w, h, cells);
             var g = new Game();
 
-            Assert.Equal(result, BestMove.EvaluatePosition(g, f, false));
+            Assert.Equal(result, BestMove.EvaluatePosition(g, f));
         }
     }
 }

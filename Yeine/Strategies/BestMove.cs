@@ -11,12 +11,17 @@ namespace Yeine.Strategies
     {
         private readonly int lookahead;
         private readonly int sacrificeOptions;
-        private readonly bool evaluationShortcuts;
-        public BestMove(int lookahead = 4, int sacrificeOptions = 5, bool evaluationShortcuts = true)
+        private readonly double attackFactor;
+        private readonly double defenseFactor;
+        private readonly int deadzone;
+
+        public BestMove(int lookahead = 4, int sacrificeOptions = 5, double attackFactor = 0.0, double defenseFactor = 0.0, int deadzone = 0)
         {
             this.lookahead = lookahead;
             this.sacrificeOptions = sacrificeOptions;
-            this.evaluationShortcuts = true;
+            this.attackFactor = attackFactor;
+            this.defenseFactor = defenseFactor;
+            this.deadzone = deadzone;
         }
 
         public Move Act(Game state, Action<string> report)
@@ -115,27 +120,39 @@ namespace Yeine.Strategies
                 position.Simulate();
             }
 
-            return EvaluatePosition(state, position, evaluationShortcuts);
+            return EvaluatePosition(state, position, attackFactor, defenseFactor, deadzone);
         }
 
-        public static int EvaluatePosition(Game state, Field position, bool shortcuts)
+        public static int EvaluatePosition(Game state, Field position, double attackFactor = 0.0, double defenseFactor = 0.0, int deadzone = 0)
         {
             var ours = 0;
             var theirs = 0;
 
             position.Evaluate(state.OurID, state.TheirID, out ours, out theirs);
 
-            if (shortcuts)
+            // don't lose the game by mistake
+            if (ours == 0) return int.MinValue; 
+
+            // always win the game if possible
+            if (theirs == 0) return int.MaxValue; 
+
+            // if already ahead, prioritise destroying enemy cells 
+            if ((ours - theirs) > deadzone)
             {
-                if (ours == 0) return int.MinValue;
-                if (theirs == 0) return int.MaxValue;
+                var weight = (double)ours - (double)theirs;
+                var weightedEnemyCells = (double)theirs * (1.0 + weight * attackFactor);
+                theirs = (int)weightedEnemyCells;
+            }
+            else if ((theirs - ours) > deadzone)
+            {
+                var weight = (double)theirs - (double)ours;
+                var weightedOwnCells = (double)ours * (1.0 + weight * defenseFactor);
+                ours = (int)weightedOwnCells;
             }
 
             return ours - theirs;
         }
 
-        public override string ToString() => $"{nameof(BestMove)}(look {lookahead}, sac {sacrificeOptions}, {PlusMinus(evaluationShortcuts)}s)";
-
-        private char PlusMinus(bool b) => b ? '+' : '-';
+        public override string ToString() => $"(att {attackFactor}, def {defenseFactor}, gap {deadzone})";
     }
 }

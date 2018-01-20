@@ -49,7 +49,7 @@ namespace Yeine.Bench
         [Benchmark] 
         public int Eval()
         {
-            return BestMove.EvaluatePosition(state, state.Field, true);
+            return BestMove.EvaluatePosition(state, state.Field);
         }
 
         [Benchmark] 
@@ -57,7 +57,7 @@ namespace Yeine.Bench
         {
             var clonedField = state.Field.Clone();
             clonedField.Simulate();
-            return BestMove.EvaluatePosition(state, clonedField, true);
+            return BestMove.EvaluatePosition(state, clonedField);
         }
 
         [Benchmark] 
@@ -68,7 +68,7 @@ namespace Yeine.Bench
             clonedField.Simulate();
             clonedField.Simulate();
             clonedField.Simulate();
-            return BestMove.EvaluatePosition(state, clonedField, true);
+            return BestMove.EvaluatePosition(state, clonedField);
         }
     }
 }
