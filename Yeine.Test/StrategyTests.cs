@@ -23,7 +23,7 @@ namespace Yeine.Test
             state.ParseField(2, 2, "0,0,1,.");
 
             var strat = new RandomMoves();
-            var move = strat.Act(state);
+            var move = strat.Act(state, _ => {});
 
             Assert.NotEqual(MoveType.Pass, move.Command);
         }
@@ -34,7 +34,7 @@ namespace Yeine.Test
             state.ParseField(1, 1, ".");
 
             var strat = new RandomMoves();
-            var move = strat.Act(state);
+            var move = strat.Act(state, _ => {});
 
             Assert.Equal(MoveType.Pass, move.Command);
         }
@@ -43,7 +43,7 @@ namespace Yeine.Test
         public void AlwaysPass_AlwaysPasses()
         {
             var strat = new AlwaysPass();
-            var move = strat.Act(state);
+            var move = strat.Act(state, _ => {});
 
             Assert.Equal(MoveType.Pass, move.Command);
         }
@@ -52,7 +52,7 @@ namespace Yeine.Test
         public void BestMove_DoesntCrash()
         {
             var strat = new BestMove(1, 4);
-            var move = strat.Act(state);
+            var move = strat.Act(state, _ => {});
         }
 
         [Theory]

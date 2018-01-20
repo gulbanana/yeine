@@ -12,7 +12,7 @@ namespace Yeine.Test
         {
             private readonly Move move;
             public Repeat(Move move) => this.move = move;
-            public Move Act(Game state) => move;
+            public Move Act(Game state, Action<string> report) => move;
         }
 
         [Fact]

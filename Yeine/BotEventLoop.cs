@@ -39,7 +39,7 @@ namespace Yeine
                     state.Log($"begin turn, {timeout}ms available");
                     timer.Restart();
 
-                    var move = strategy.Act(state);
+                    var move = strategy.Act(state, state.Log);
 
                     timer.Stop();
                     state.Log($"end turn, {timer.ElapsedMilliseconds}ms used");

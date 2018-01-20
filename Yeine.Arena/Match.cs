@@ -72,7 +72,7 @@ namespace Yeine.Arena
             state.ParseField(CurrentField.Width, CurrentField.Height, CurrentField.ToString());
             state.RoundNumber = currentRound;
 
-            var m = strat.Act(state);
+            var m = strat.Act(state, _ => {});
             var v1 = EvaluatePosition(state, CurrentField);
             CurrentField.ProcessCommand(m, state.OurID);
             CurrentField.Simulate();

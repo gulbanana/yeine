@@ -36,9 +36,9 @@ namespace Yeine.Bench
                 ".,.,.,.,1,.,.,.,1,.,.,.,.,.,1,1,1,.");
         }
 
-        [Benchmark(Baseline = true)] public void BestMove_12() => bm12.Act(state);
-        [Benchmark] public Move BestMove_34() => bm34.Act(state);
-        [Benchmark] public Move BestMove_45() => bm45.Act(state);
-        [Benchmark] public Move BestMove_46() => bm46.Act(state);
+        [Benchmark(Baseline = true)] public void BestMove_12() => bm12.Act(state, _ => {});
+        [Benchmark] public Move BestMove_34() => bm34.Act(state, _ => {});
+        [Benchmark] public Move BestMove_45() => bm45.Act(state, _ => {});
+        [Benchmark] public Move BestMove_46() => bm46.Act(state, _ => {});
     }
 }

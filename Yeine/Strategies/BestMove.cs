@@ -12,7 +12,6 @@ namespace Yeine.Strategies
         private readonly int lookahead;
         private readonly int sacrificeOptions;
         private readonly bool evaluationShortcuts;
-
         public BestMove(int lookahead = 4, int sacrificeOptions = 5, bool evaluationShortcuts = true)
         {
             this.lookahead = lookahead;
@@ -20,9 +19,11 @@ namespace Yeine.Strategies
             this.evaluationShortcuts = true;
         }
 
-        public Move Act(Game state)
+        public Move Act(Game state, Action<string> report)
         {
-            var passValue = Lookahead(state, _ => {});
+            var predictions = 0;
+
+            var passValue = Predict(state, _ => {}); predictions++;
 
             var bestKillValue = 0;
             var bestKillTarget = default(Point);
@@ -34,7 +35,7 @@ namespace Yeine.Strategies
                 {
                     if (state.Field.Cells[x,y] != '.')
                     {
-                        var killValue = Lookahead(state, f => f.Cells[x,y] = '.') - passValue;
+                        var killValue = Predict(state, f => f.Cells[x,y] = '.') - passValue; predictions++;
 
                         if (killValue > bestKillValue)
                         {
@@ -67,12 +68,12 @@ namespace Yeine.Strategies
                         {
                             for (var s2 = s1+1; s2 < sacrifices.Length; s2++)
                             {
-                                var birthValue = Lookahead(state, f =>
+                                var birthValue = Predict(state, f =>
                                 {
                                     f.Cells[x,y] = state.OurID;
                                     f.Cells[sacrifices[s1].X,sacrifices[s1].Y] = '.';
                                     f.Cells[sacrifices[s2].X,sacrifices[s2].Y] = '.';
-                                }) - passValue;
+                                }) - passValue; predictions++;
 
                                 if (birthValue > bestBirthValue)
                                 {
@@ -86,6 +87,8 @@ namespace Yeine.Strategies
                     }
                 }
             }
+
+            report($"executed {predictions} predictions");
 
             if (bestBirthValue > bestKillValue)
             {
@@ -101,7 +104,7 @@ namespace Yeine.Strategies
             }
         }
 
-        private int Lookahead(Game state, Action<Field> f)
+        private int Predict(Game state, Action<Field> f)
         {
             var position = state.Field.Clone();
             
