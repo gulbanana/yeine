@@ -1,6 +1,8 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using Yeine.API;
 using Yeine.State;
 
@@ -9,13 +11,15 @@ namespace Yeine.Arena
     class ArenaEventLoop
     {        
         private readonly int verbosity;
+        private readonly bool runParallel;
         private readonly IStrategy p0;
         private readonly IStrategy p1;
         private readonly Random random;
 
-        public ArenaEventLoop(int verbosity, IStrategy p0, IStrategy p1)
+        public ArenaEventLoop(int verbosity, bool runParallel, IStrategy p0, IStrategy p1)
         {
             this.verbosity = verbosity;
+            this.runParallel = runParallel;
             this.p0 = p0;
             this.p1 = p1;
             random = new Random();
@@ -27,24 +31,50 @@ namespace Yeine.Arena
             int p1Wins = 0;
             int draws = 0;
 
-            for (var i = 0; i < games; i++)
+            if (runParallel)
             {
-                var startingField = CreateRandomField(18, 16);
-                
-                var match1 = new Match(verbosity, startingField.Clone(), p0, p1);
-                switch (match1.PlayGame())
+                Parallel.For(0, games, _ =>
                 {
-                    case GameResult.Player0Win: p0Wins++; break;
-                    case GameResult.Player1Win: p1Wins++; break;
-                    case GameResult.Draw: draws++; break;
-                }
-                
-                var match2 = new Match(verbosity, startingField.Clone(), p1, p0);
-                switch (match2.PlayGame())
+                    var startingField = CreateRandomField(18, 16);
+                    
+                    var match1 = new Match(verbosity, startingField.Clone(), p0, p1);
+                    switch (match1.PlayGame())
+                    {
+                        case GameResult.Player0Win: Interlocked.Increment(ref p0Wins); break;
+                        case GameResult.Player1Win: Interlocked.Increment(ref p1Wins); break;
+                        case GameResult.Draw: Interlocked.Increment(ref draws); break;
+                    }
+                    
+                    var match2 = new Match(verbosity, startingField.Clone(), p1, p0);
+                    switch (match2.PlayGame())
+                    {
+                        case GameResult.Player0Win: Interlocked.Increment(ref p1Wins); break;
+                        case GameResult.Player1Win: Interlocked.Increment(ref p0Wins); break;
+                        case GameResult.Draw: Interlocked.Increment(ref draws); break;
+                    }
+                });
+            }
+            else
+            {
+                for (var i = 0; i < games; i++)
                 {
-                    case GameResult.Player0Win: p1Wins++; break;
-                    case GameResult.Player1Win: p0Wins++; break;
-                    case GameResult.Draw: draws++; break;
+                    var startingField = CreateRandomField(18, 16);
+                    
+                    var match1 = new Match(verbosity, startingField.Clone(), p0, p1);
+                    switch (match1.PlayGame())
+                    {
+                        case GameResult.Player0Win: p0Wins++; break;
+                        case GameResult.Player1Win: p1Wins++; break;
+                        case GameResult.Draw: draws++; break;
+                    }
+                    
+                    var match2 = new Match(verbosity, startingField.Clone(), p1, p0);
+                    switch (match2.PlayGame())
+                    {
+                        case GameResult.Player0Win: p1Wins++; break;
+                        case GameResult.Player1Win: p0Wins++; break;
+                        case GameResult.Draw: draws++; break;
+                    }
                 }
             }
 

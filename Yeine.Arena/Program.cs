@@ -17,15 +17,8 @@ namespace Yeine.Arena
 
             var strategies = new Func<IMoveEvaluator, IStrategy>[]
             {
-                e => new Strategies.BestMove(e, 3, 3),
                 e => new Strategies.BestMove(e, 3, 4),
-                e => new Strategies.BestMove(e, 3, 5),
-                e => new Strategies.BestMove(e, 4, 3),
-                e => new Strategies.BestMove(e, 4, 4),
                 e => new Strategies.BestMove(e, 4, 5),
-                e => new Strategies.BestMove(e, 5, 3),
-                e => new Strategies.BestMove(e, 5, 4),
-                e => new Strategies.BestMove(e, 5, 5),
             };
 
             var evaluators = new IMoveEvaluator[]
@@ -45,7 +38,7 @@ namespace Yeine.Arena
 
             Parallel.ForEach(pairs, pair =>
             {
-                var eventLoop = new ArenaEventLoop(isVeryVerbose ? 2 : isVerbose ? 1 : 0, pair.b1, pair.b2);
+                var eventLoop = new ArenaEventLoop(isVeryVerbose ? 2 : isVerbose ? 1 : 0, pairs.Count == 1, pair.b1, pair.b2);
                 eventLoop.Run(int.Parse(count));
             });
         }
