@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Text;
 using Yeine.API;
 
@@ -7,43 +6,6 @@ namespace Yeine.State
 {
     public struct Field
     {
-        private static readonly List<Point>[,] affectedPoints;
-
-        static Field()
-        {
-            affectedPoints = new List<Point>[18,16];
-
-            for (var x = 0; x < 18; x++)
-            {
-                for (var y = 0; y < 16; y++)
-                {
-                    var ps = new List<Point>();
-
-                    var notLeft = x > 0;
-                    var notRight = x < 18 - 1;
-
-                    if (notLeft) ps.Add(new Point(x-1, y));
-                    if (notRight) ps.Add(new Point(x+1, y));
-
-                    if (y > 0)
-                    {
-                        ps.Add(new Point(x, y-1));
-                        if (notLeft) ps.Add(new Point(x-1, y-1));
-                        if (notRight) ps.Add(new Point(x+1, y-1));
-                    }
-
-                    if (y < 16-1)
-                    {
-                        ps.Add(new Point(x, y+1));
-                        if (notLeft) ps.Add(new Point(x-1, y+1));
-                        if (notRight) ps.Add(new Point(x+1, y+1));
-                    }
-
-                    affectedPoints[x,y] = ps;
-                }
-            }
-        }
-
         public readonly int Width;
         public readonly int Height;
         public readonly char[,] Cells;
@@ -181,9 +143,24 @@ namespace Yeine.State
                     if (Cells[x,y] != '.')
                     {
                         var p = Cells[x,y] - '0';
-                        foreach (var affected in affectedPoints[x,y])
+                        var notLeft = x > 0;
+                        var notRight = x < Width - 1;
+
+                        if (notLeft) neighbours[p, x-1, y]++;
+                        if (notRight) neighbours[p, x+1, y]++;
+
+                        if (y > 0)
                         {
-                            neighbours[p, affected.X, affected.Y]++;
+                            neighbours[p, x, y-1]++;
+                            if (notLeft) neighbours[p, x-1, y-1]++;
+                            if (notRight) neighbours[p, x+1, y-1]++;
+                        }
+
+                        if (y < Height-1)
+                        {
+                            neighbours[p, x, y+1]++;
+                            if (notLeft) neighbours[p, x-1, y+1]++;
+                            if (notRight) neighbours[p, x+1, y+1]++;
                         }
                     }
                 }
