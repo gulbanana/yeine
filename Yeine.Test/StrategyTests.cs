@@ -51,14 +51,18 @@ namespace Yeine.Test
         [Fact]
         public void BestMove_DoesntCrash()
         {
+            state.ParseField(1, 1, ".");
+
             var strat = new BestMove(1, 4);
             var move = strat.Act(state, _ => {});
         }
 
         [Theory]
-        [InlineData(1, 1, ".", 0)]
-        [InlineData(1, 1, "0", 1)]
-        [InlineData(1, 1, "1", -1)]
+        [InlineData(2, 1, "0,1", 0)]
+        [InlineData(1, 1, "0", int.MaxValue)]
+        [InlineData(1, 1, "1", int.MinValue)]
+        [InlineData(3, 1, "0,0,1", 1)]
+        [InlineData(3, 1, "0,1,1", -1)]
         [InlineData(3, 3, "0,0,.,0,.,.,.,.,1", 2)]
         public void BestMove_CellDifferenceCount(int w, int h, string cells, int result)
         {
