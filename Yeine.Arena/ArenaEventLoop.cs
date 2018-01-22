@@ -58,12 +58,12 @@ namespace Yeine.Arena
 
         private Field CreateRandomField(int w, int h)
         {
-            var cells = new char[w,h];
-            for (var x = 0; x < w; x++)
+            var cells = new char[h,w];
+            for (var y = 0; y < h; y++)
             {
-                for (var y = 0; y < h; y++)
+                for (var x = 0; x < w; x++)
                 {
-                    cells[x,y] = '.';
+                    cells[y,x] = '.';
                 }
             }
 
@@ -72,15 +72,15 @@ namespace Yeine.Arena
                 var x = random.Next(0, w-1);
                 var y = random.Next(0, (h/2)-1);
 
-                if (cells[x,y] == '.')
+                if (cells[y,x] == '.')
                 {
-                    cells[x,y] = '0';
-                    cells[x,h-1-y] = '1';
+                    cells[y,x] = '0';
+                    cells[h-1-y, x] = '1';
                     i++;
                 }
             }
 
-            return new Field(18, 16, cells, new byte[2, 18, 16]);
+            return new Field(w, h, cells, new byte[2, 18, 16]);
         }
     }
 }
