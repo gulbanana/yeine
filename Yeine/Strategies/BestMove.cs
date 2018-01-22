@@ -145,6 +145,6 @@ namespace Yeine.Strategies
             return ours - theirs;
         }
 
-        public override string ToString() => $"(agg {attackFactor},  gap {deadzone})";
+        public override string ToString() => $"(agg {attackFactor}, gap {deadzone})";
     }
 }
