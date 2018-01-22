@@ -8,6 +8,7 @@ namespace Yeine.State
     {
         public readonly int Width;
         public readonly int Height;
+        private readonly int length;
         public readonly char[,] Cells;
         private readonly byte[,,] neighbours;
 
@@ -15,6 +16,7 @@ namespace Yeine.State
         {
             Width = width;
             Height = height;
+            length = width * height;
             Cells = cells;
             this.neighbours = neighbours;
         }
@@ -23,6 +25,7 @@ namespace Yeine.State
         {
             Width = width;
             Height = height;
+            length = width * height;
             Cells = new char[height, width];
             neighbours = new byte[2, height, width];
 
@@ -35,6 +38,7 @@ namespace Yeine.State
         {
             Width = width;
             Height = height;
+            length = width * height;
             Cells = new char[height, width];
             neighbours = new byte[2, height, width];
             
@@ -125,65 +129,67 @@ namespace Yeine.State
         {
             unsafe 
             {
-                fixed (byte* bs = neighbours)
+                fixed (byte* pNeighbours = neighbours)
+                fixed (char* pCells = Cells)
                 {
-                    long* ls = (long*)bs;
+                    long* ls = (long*)pNeighbours;
                     for (var i = 0; i < neighbours.Length / 8; i++)
                     {
                         ls[i] = 0;
                     }
-                }
-            } 
             
-            // pass 1: count neighbours
-            for (var y = 0; y < Height; y++)
-            {
-                for (var x = 0; x < Width; x++)
-                {
-                    if (Cells[y,x] != '.')
+                    // pass 1: count neighbours
+                    for (var y = 0; y < Height; y++)
                     {
-                        var p = Cells[y,x] - '0';
-                        var notLeft = x > 0;
-                        var notRight = x < Width - 1;
-
-                        if (notLeft) neighbours[p, y, x-1]++;
-                        if (notRight) neighbours[p, y, x+1]++;
-
-                        if (y > 0)
+                        for (var x = 0; x < Width; x++)
                         {
-                            neighbours[p, y-1, x]++;
-                            if (notLeft) neighbours[p, y-1, x-1]++;
-                            if (notRight) neighbours[p, y-1, x+1]++;
-                        }
+                            if (pCells[y*Width + x] != '.')
+                            {
+                                var ixPlayer = (pCells[y*Width + x] - '0') * length;
 
-                        if (y < Height-1)
-                        {
-                            neighbours[p, y+1, x]++;
-                            if (notLeft) neighbours[p, y+1, x-1]++;
-                            if (notRight) neighbours[p, y+1, x+1]++;
+                                var notLeft = x > 0;
+                                var notRight = x < Width - 1;
+
+                                if (notLeft) pNeighbours[ixPlayer + y*Width + x-1]++;
+                                if (notRight) pNeighbours[ixPlayer + y*Width + x+1]++;
+
+                                if (y > 0)
+                                {
+                                    pNeighbours[ixPlayer + (y-1)*Width + x]++;
+                                    if (notLeft) pNeighbours[ixPlayer + (y-1)*Width + x-1]++;
+                                    if (notRight) pNeighbours[ixPlayer + (y-1)*Width + x+1]++;
+                                }
+
+                                if (y < Height-1)
+                                {
+                                    pNeighbours[ixPlayer + (y+1)*Width + x]++;
+                                    if (notLeft) pNeighbours[ixPlayer + (y+1)*Width + x-1]++;
+                                    if (notRight) pNeighbours[ixPlayer + (y+1)*Width + x+1]++;
+                                }
+                            }
                         }
                     }
-                }
-            }
 
-            // pass 2: life and death
-            for (var y = 0; y < Height; y++)
-            {
-                for (var x = 0; x < Width; x++)
-                {
-                    var totalNeighbours = neighbours[0,y,x] + neighbours[1,y,x];
-                    if (Cells[y,x] == '.')
-                    {                        
-                        if (totalNeighbours == 3)
-                        {
-                            Cells[y,x] = neighbours[0,y,x] > neighbours[1,y,x] ? '0' : '1';
-                        }
-                    }
-                    else // living cell
+                    // pass 2: life and death
+                    for (var y = 0; y < Height; y++)
                     {
-                        if (totalNeighbours < 2 || totalNeighbours > 3)
+                        for (var x = 0; x < Width; x++)
                         {
-                            Cells[y,x] = '.';
+                            var totalNeighbours = pNeighbours[y*Width + x] + pNeighbours[length + y*Width + x];
+                            if (pCells[y*Width + x] == '.')
+                            {                        
+                                if (totalNeighbours == 3)
+                                {
+                                    pCells[y*Width + x] = pNeighbours[y*Width + x] > pNeighbours[length + y*Width + x] ? '0' : '1';
+                                }
+                            }
+                            else // living cell
+                            {
+                                if (totalNeighbours < 2 || totalNeighbours > 3)
+                                {
+                                    pCells[y*Width + x] = '.';
+                                }
+                            }
                         }
                     }
                 }
