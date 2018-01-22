@@ -22,7 +22,6 @@ namespace Yeine.State
 
         public Game()
         {
-            Field = new Field(0, 0, new char[0,0]);
             Player0 = new Player(0);
             Player1 = new Player(1);
         }

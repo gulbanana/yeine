@@ -5,6 +5,7 @@ using Yeine.Strategies;
 
 namespace Yeine.Bench
 {
+    [MemoryDiagnoser]
     public class ParameterComparison
     {
         private readonly Game state;
@@ -37,8 +38,8 @@ namespace Yeine.Bench
         }
 
         [Benchmark(Baseline = true)] public void BestMove_12() => bm12.Act(state, _ => {});
-        [Benchmark] public Move BestMove_34() => bm34.Act(state, _ => {});
+        //[Benchmark] public Move BestMove_34() => bm34.Act(state, _ => {});
         [Benchmark] public Move BestMove_45() => bm45.Act(state, _ => {});
-        [Benchmark] public Move BestMove_46() => bm46.Act(state, _ => {});
+        //[Benchmark] public Move BestMove_46() => bm46.Act(state, _ => {});
     }
 }

@@ -80,7 +80,7 @@ namespace Yeine.Arena
                 }
             }
 
-            return new Field(18, 16, cells);
+            return new Field(18, 16, cells, new byte[2, 18, 16]);
         }
     }
 }

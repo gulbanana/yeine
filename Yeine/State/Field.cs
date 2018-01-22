@@ -9,12 +9,14 @@ namespace Yeine.State
         public readonly int Width;
         public readonly int Height;
         public readonly char[,] Cells;
+        private readonly byte[,,] neighbours;
 
-        public Field(int width, int height, char[,] cells)
+        public Field(int width, int height, char[,] cells, byte[,,] neighbours)
         {
             Width = width;
             Height = height;
             Cells = cells;
+            this.neighbours = neighbours;
         }
 
         public Field(int width, int height, string input) 
@@ -22,7 +24,8 @@ namespace Yeine.State
             Width = width;
             Height = height;
             Cells = new char[width, height];
-            
+            neighbours = new byte[2, width, height];
+
             int p0;
             int p1;
             Parse(input, out p0, out p1);
@@ -33,6 +36,7 @@ namespace Yeine.State
             Width = width;
             Height = height;
             Cells = new char[width, height];
+            neighbours = new byte[2, width, height];
             
             Parse(input, out p0, out p1);
         }
@@ -93,7 +97,7 @@ namespace Yeine.State
 
         public Field Clone()
         {
-            return new Field(Width, Height, (char[,])Cells.Clone());
+            return new Field(Width, Height, (char[,])Cells.Clone(), neighbours);
         }
 
         public void Evaluate(char us, char them, out int ours, out int theirs)
@@ -119,8 +123,18 @@ namespace Yeine.State
 
         public void Simulate()
         {
-            var neighbours = new int[2, Width, Height];
-
+            unsafe 
+            {
+                fixed (byte* bs = neighbours)
+                {
+                    long* ls = (long*)bs;
+                    for (var i = 0; i < neighbours.Length / 8; i++)
+                    {
+                        ls[i] = 0;
+                    }
+                }
+            } 
+            
             // pass 1: count neighbours
             for (var x = 0; x < Width; x++)
             {

@@ -4,6 +4,7 @@ using Yeine.Strategies;
 
 namespace Yeine.Bench
 {
+    [MemoryDiagnoser]
     public class TurnComponents
     {
         private readonly Game state;
