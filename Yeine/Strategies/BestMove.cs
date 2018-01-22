@@ -12,15 +12,13 @@ namespace Yeine.Strategies
         private readonly int lookahead;
         private readonly int sacrificeOptions;
         private readonly double attackFactor;
-        private readonly double defenseFactor;
         private readonly int deadzone;
 
-        public BestMove(int lookahead = 4, int sacrificeOptions = 5, double attackFactor = 0.0, double defenseFactor = 0.0, int deadzone = 0)
+        public BestMove(int lookahead = 4, int sacrificeOptions = 5, double attackFactor = 0.0, int deadzone = 0)
         {
             this.lookahead = lookahead;
             this.sacrificeOptions = sacrificeOptions;
             this.attackFactor = attackFactor;
-            this.defenseFactor = defenseFactor;
             this.deadzone = deadzone;
         }
 
@@ -120,10 +118,10 @@ namespace Yeine.Strategies
                 position.Simulate();
             }
 
-            return EvaluatePosition(state, position, attackFactor, defenseFactor, deadzone);
+            return EvaluatePosition(state, position, attackFactor, deadzone);
         }
 
-        public static int EvaluatePosition(Game state, Field position, double attackFactor = 0.0, double defenseFactor = 0.0, int deadzone = 0)
+        public static int EvaluatePosition(Game state, Field position, double attackFactor = 0.0, int deadzone = 0)
         {
             var ours = 0;
             var theirs = 0;
@@ -143,16 +141,10 @@ namespace Yeine.Strategies
                 var weightedEnemyCells = (double)theirs * (1.0 + weight * attackFactor);
                 theirs = (int)weightedEnemyCells;
             }
-            else if ((theirs - ours) > deadzone)
-            {
-                var weight = (double)theirs - (double)ours;
-                var weightedOwnCells = (double)ours * (1.0 + weight * defenseFactor);
-                ours = (int)weightedOwnCells;
-            }
 
             return ours - theirs;
         }
 
-        public override string ToString() => $"(att {attackFactor}, def {defenseFactor}, gap {deadzone})";
+        public override string ToString() => $"(agg {attackFactor},  gap {deadzone})";
     }
 }
