@@ -51,7 +51,7 @@ namespace Yeine.Test
         [Fact]
         public void BestMove_DoesntCrash()
         {
-            state.ParseField(1, 1, ".");
+            state.ParseField(3, 3, "0,0,.,0,.,.,.,.,1");
 
             var strat = new BestMove(1, 4);
             var move = strat.Act(state, _ => {});
