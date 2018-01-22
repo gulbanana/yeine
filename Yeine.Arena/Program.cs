@@ -18,16 +18,16 @@ namespace Yeine.Arena
 
             var bots = new IStrategy[]
             {
-                new Strategies.BestMove(4, 5, 0.000, 0.000),
-                new Strategies.BestMove(4, 5, 0.005, 0.000, 0),
-                new Strategies.BestMove(4, 5, 0.005, 0.000, 10),
-                new Strategies.BestMove(4, 5, 0.005, 0.000, 30),
-                new Strategies.BestMove(4, 5, 0.000, 0.005, 0),
-                new Strategies.BestMove(4, 5, 0.000, 0.005, 10),
-                new Strategies.BestMove(4, 5, 0.000, 0.005, 30),
-                new Strategies.BestMove(4, 5, 0.005, 0.005, 0),
-                new Strategies.BestMove(4, 5, 0.005, 0.005, 10),
-                new Strategies.BestMove(4, 5, 0.005, 0.005, 30),
+                new Strategies.BestMove(4, 5, 0.000),
+                new Strategies.BestMove(4, 5, 0.005, 0),
+                new Strategies.BestMove(4, 5, 0.005, 10),
+                new Strategies.BestMove(4, 5, 0.005, 30),
+                new Strategies.BestMove(4, 5, 0.000, 0),
+                new Strategies.BestMove(4, 5, 0.000, 10),
+                new Strategies.BestMove(4, 5, 0.000, 30),
+                new Strategies.BestMove(4, 5, 0.005, 0),
+                new Strategies.BestMove(4, 5, 0.005, 10),
+                new Strategies.BestMove(4, 5, 0.005, 30),
             };
 
             var pairs = new List<(int b1,int b2)>();
