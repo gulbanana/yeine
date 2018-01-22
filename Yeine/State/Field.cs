@@ -104,98 +104,92 @@ namespace Yeine.State
             return new Field(Width, Height, (char[,])Cells.Clone(), neighbours);
         }
 
-        public void Evaluate(char us, char them, out int ours, out int theirs)
+        public unsafe void Simulate()
         {
-            ours = 0;
-            theirs = 0;
-
-            unsafe 
+            fixed (byte* pNeighbours = neighbours)
+            fixed (char* pCells = Cells)
             {
-                fixed (char* pCells = Cells)
+                long* ls = (long*)pNeighbours;
+                for (var i = 0; i < neighbours.Length / 8; i++)
                 {
-                    for (var i = 0; i < length; i++)
+                    ls[i] = 0;
+                }
+        
+                // pass 1: count neighbours
+                for (var y = 0; y < Height; y++)
+                {
+                    for (var x = 0; x < Width; x++)
                     {
-                        if (pCells[i] == us)
+                        if (pCells[y*Width + x] != '.')
                         {
-                            ours++;
-                        }
-                        else if (pCells[i] == them)
-                        {
-                            theirs++;
+                            var ixPlayer = (pCells[y*Width + x] - '0') * length;
+
+                            var notLeft = x > 0;
+                            var notRight = x < Width - 1;
+
+                            if (notLeft) pNeighbours[ixPlayer + y*Width + x-1]++;
+                            if (notRight) pNeighbours[ixPlayer + y*Width + x+1]++;
+
+                            if (y > 0)
+                            {
+                                pNeighbours[ixPlayer + (y-1)*Width + x]++;
+                                if (notLeft) pNeighbours[ixPlayer + (y-1)*Width + x-1]++;
+                                if (notRight) pNeighbours[ixPlayer + (y-1)*Width + x+1]++;
+                            }
+
+                            if (y < Height-1)
+                            {
+                                pNeighbours[ixPlayer + (y+1)*Width + x]++;
+                                if (notLeft) pNeighbours[ixPlayer + (y+1)*Width + x-1]++;
+                                if (notRight) pNeighbours[ixPlayer + (y+1)*Width + x+1]++;
+                            }
                         }
                     }
                 }
-            }
-        }
 
-        public void Simulate()
-        {
-            unsafe 
-            {
-                fixed (byte* pNeighbours = neighbours)
-                fixed (char* pCells = Cells)
+                // pass 2: life and death
+                for (var i = 0; i < length; i++)
                 {
-                    long* ls = (long*)pNeighbours;
-                    for (var i = 0; i < neighbours.Length / 8; i++)
-                    {
-                        ls[i] = 0;
-                    }
-            
-                    // pass 1: count neighbours
-                    for (var y = 0; y < Height; y++)
-                    {
-                        for (var x = 0; x < Width; x++)
+                    var totalNeighbours = pNeighbours[i] + pNeighbours[length + i];
+                    if (pCells[i] == '.')
+                    {                        
+                        if (totalNeighbours == 3)
                         {
-                            if (pCells[y*Width + x] != '.')
-                            {
-                                var ixPlayer = (pCells[y*Width + x] - '0') * length;
-
-                                var notLeft = x > 0;
-                                var notRight = x < Width - 1;
-
-                                if (notLeft) pNeighbours[ixPlayer + y*Width + x-1]++;
-                                if (notRight) pNeighbours[ixPlayer + y*Width + x+1]++;
-
-                                if (y > 0)
-                                {
-                                    pNeighbours[ixPlayer + (y-1)*Width + x]++;
-                                    if (notLeft) pNeighbours[ixPlayer + (y-1)*Width + x-1]++;
-                                    if (notRight) pNeighbours[ixPlayer + (y-1)*Width + x+1]++;
-                                }
-
-                                if (y < Height-1)
-                                {
-                                    pNeighbours[ixPlayer + (y+1)*Width + x]++;
-                                    if (notLeft) pNeighbours[ixPlayer + (y+1)*Width + x-1]++;
-                                    if (notRight) pNeighbours[ixPlayer + (y+1)*Width + x+1]++;
-                                }
-                            }
+                            pCells[i] = pNeighbours[i] > pNeighbours[length + i] ? '0' : '1';
                         }
                     }
-
-                    // pass 2: life and death
-                    for (var i = 0; i < length; i++)
+                    else // living cell
                     {
-                        var totalNeighbours = pNeighbours[i] + pNeighbours[length + i];
-                        if (pCells[i] == '.')
-                        {                        
-                            if (totalNeighbours == 3)
-                            {
-                                pCells[i] = pNeighbours[i] > pNeighbours[length + i] ? '0' : '1';
-                            }
-                        }
-                        else // living cell
+                        if (totalNeighbours < 2 || totalNeighbours > 3)
                         {
-                            if (totalNeighbours < 2 || totalNeighbours > 3)
-                            {
-                                pCells[i] = '.';
-                            }
+                            pCells[i] = '.';
                         }
                     }
                 }
             }
         }
         
+        public unsafe void Evaluate(char us, char them, out int ours, out int theirs)
+        {
+            ours = 0;
+            theirs = 0;
+
+            fixed (char* pCells = Cells)
+            {
+                for (var i = 0; i < length; i++)
+                {
+                    if (pCells[i] == us)
+                    {
+                        ours++;
+                    }
+                    else if (pCells[i] == them)
+                    {
+                        theirs++;
+                    }
+                }
+            }
+        }
+
         // inefficient, but it's only used in tests
         public override string ToString()
         {
