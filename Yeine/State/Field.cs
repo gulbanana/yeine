@@ -190,24 +190,21 @@ namespace Yeine.State
             }
         }
 
-        // inefficient, but it's only used in tests
-        public override string ToString()
+        public unsafe override string ToString()
         {
-            var builder = new StringBuilder();
+            var textCells = new char[length*2-1];
 
-            for (var y = 0; y < Height; y++)
+            fixed (char* pCells = Cells)
             {
-                for (var x = 0; x < Width; x++)
+                textCells[0] = pCells[0];
+                for (var i = 1; i < length; i++)
                 {
-                    if (builder.Length != 0)
-                    {
-                        builder.Append(",");
-                    }
-                    builder.Append(Cells[y,x]);
+                    textCells[i*2 - 1] = ',';
+                    textCells[i*2] = pCells[i];
                 }
             }
 
-            return builder.ToString();
+            return new string(textCells);
         }
     }
 }
