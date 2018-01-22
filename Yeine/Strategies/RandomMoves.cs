@@ -89,7 +89,7 @@ namespace Yeine.Strategies
             {
                 for (int y = 0; y < state.Field.Height; y++)
                 {
-                    var cell = state.Field.Cells[x,y];
+                    var cell = state.Field.Cells[y,x];
 
                     cellMap[cell].Add(new Point(x, y));
                 }

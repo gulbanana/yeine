@@ -19,9 +19,9 @@ namespace Yeine.Test
             Assert.Equal(w, f.Width);
             Assert.Equal(h, f.Height);
 
-            var doesNotThrow = f.Cells[w-1, h-1];
-            Assert.Throws<IndexOutOfRangeException>(() => f.Cells[w, h-1]);
-            Assert.Throws<IndexOutOfRangeException>(() => f.Cells[w-1, h]);
+            var doesNotThrow = f.Cells[h-1, w-1];
+            Assert.Throws<IndexOutOfRangeException>(() => f.Cells[h-1, w]);
+            Assert.Throws<IndexOutOfRangeException>(() => f.Cells[h, w-1]);
         }
 
         [Theory]
@@ -39,7 +39,7 @@ namespace Yeine.Test
             {
                 for (var y = 0; y < h; y++)
                 {
-                    Assert.Equal(f1.Cells[x,y], f2.Cells[x,y]);
+                    Assert.Equal(f1.Cells[y,x], f2.Cells[y,x]);
                 }
             }
         }
@@ -70,15 +70,15 @@ namespace Yeine.Test
         {
             var f = new Field(18, 16, ".,0,0,0,.,.,.,.,.,0,.,.,.,0,.,.,.,.,0,.,.,.,.,0,0,.,.,.,.,.,.,0,0,.,.,0,.,0,.,0,0,.,.,0,.,0,0,.,.,.,.,.,0,.,.,0,.,.,.,.,.,.,.,0,.,.,.,0,0,.,.,.,0,0,0,.,.,.,.,0,0,.,.,0,.,.,.,.,.,.,.,.,0,.,.,.,.,.,.,0,.,.,.,.,.,.,0,.,0,.,0,.,.,.,.,0,0,.,.,0,0,0,.,.,.,.,.,0,.,.,.,0,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.,1,.,.,.,1,.,.,.,.,.,1,1,1,.,.,1,1,.,.,.,.,1,.,1,.,1,.,.,.,.,.,.,1,.,.,.,.,.,.,1,.,.,.,.,.,.,.,.,1,.,.,1,1,.,.,.,.,1,1,1,.,.,.,1,1,.,.,.,1,.,.,.,.,.,.,.,1,.,.,1,.,.,.,.,.,1,1,.,1,.,.,1,1,.,1,.,1,.,.,1,1,.,.,.,.,.,.,1,1,.,.,.,.,1,.,.,.,.,1,.,.,.,1,.,.,.,.,.,1,1,1,.");
             
-            Assert.Equal('.', f.Cells[6,7]);
-            Assert.Equal('0', f.Cells[3,0]);
-            Assert.Equal('0', f.Cells[9,0]);
+            Assert.Equal('.', f.Cells[7,6]);
+            Assert.Equal('0', f.Cells[0,3]);
+            Assert.Equal('0', f.Cells[0,9]);
 
             f.ProcessCommand(Move.Birth(new Point(6,7), new Point(3,0), new Point(9,0)), '0');
 
-            Assert.Equal('0', f.Cells[6,7]);
-            Assert.Equal('.', f.Cells[3,0]);
-            Assert.Equal('.', f.Cells[9,0]);
+            Assert.Equal('0', f.Cells[7,6]);
+            Assert.Equal('.', f.Cells[0,3]);
+            Assert.Equal('.', f.Cells[0,9]);
         }
     }
 }

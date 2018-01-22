@@ -36,9 +36,9 @@ namespace Yeine.Strategies
             {
                 for (var y = 0; y < state.Field.Height; y++)
                 {
-                    if (state.Field.Cells[x,y] != '.')
+                    if (state.Field.Cells[y,x] != '.')
                     {
-                        var killValue = Predict(state, f => f.Cells[x,y] = '.') - passValue; predictions++;
+                        var killValue = Predict(state, f => f.Cells[y,x] = '.') - passValue; predictions++;
 
                         if (killValue > bestKillValue)
                         {
@@ -46,7 +46,7 @@ namespace Yeine.Strategies
                             bestKillTarget = new Point(x, y);
                         }
 
-                        if (state.Field.Cells[x,y] == state.OurID)
+                        if (state.Field.Cells[y,x] == state.OurID)
                         {
                             bestKillables.Add(new CostedMove { Value = killValue, Target = new Point(x, y)});
                         }
@@ -64,7 +64,7 @@ namespace Yeine.Strategies
             {
                 for (var y = 0; y < state.Field.Height; y++)
                 {
-                    if (state.Field.Cells[x,y] == '.')
+                    if (state.Field.Cells[y,x] == '.')
                     {
                         // potential birth target. try each combo of own-killables
                         for (var s1 = 0; s1 < sacrifices.Length - 1; s1++)
@@ -73,9 +73,9 @@ namespace Yeine.Strategies
                             {
                                 var birthValue = Predict(state, f =>
                                 {
-                                    f.Cells[x,y] = state.OurID;
-                                    f.Cells[sacrifices[s1].X,sacrifices[s1].Y] = '.';
-                                    f.Cells[sacrifices[s2].X,sacrifices[s2].Y] = '.';
+                                    f.Cells[y,x] = state.OurID;
+                                    f.Cells[sacrifices[s1].Y,sacrifices[s1].X] = '.';
+                                    f.Cells[sacrifices[s2].Y,sacrifices[s2].X] = '.';
                                 }) - passValue; predictions++;
 
                                 if (birthValue > bestBirthValue)

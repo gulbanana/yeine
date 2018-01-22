@@ -23,8 +23,8 @@ namespace Yeine.State
         {
             Width = width;
             Height = height;
-            Cells = new char[width, height];
-            neighbours = new byte[2, width, height];
+            Cells = new char[height, width];
+            neighbours = new byte[2, height, width];
 
             int p0;
             int p1;
@@ -35,8 +35,8 @@ namespace Yeine.State
         {
             Width = width;
             Height = height;
-            Cells = new char[width, height];
-            neighbours = new byte[2, width, height];
+            Cells = new char[height, width];
+            neighbours = new byte[2, height, width];
             
             Parse(input, out p0, out p1);
         }
@@ -51,7 +51,7 @@ namespace Yeine.State
             foreach (string cell in input.Split(','))
             {
                 var cellData = cell[0];
-                Cells[x,y] = cellData;
+                Cells[y,x] = cellData;
 
                 switch (cellData)
                 {
@@ -81,16 +81,16 @@ namespace Yeine.State
             {
                 case MoveType.Kill:
                     var kTarget = move.Arguments[0];
-                    Cells[kTarget.X, kTarget.Y] = '.';
+                    Cells[kTarget.Y, kTarget.X] = '.';
                     break;
 
                 case MoveType.Birth:
                     var bTarget = move.Arguments[0];
-                    Cells[bTarget.X, bTarget.Y] = us;
+                    Cells[bTarget.Y, bTarget.X] = us;
                     var sac1 = move.Arguments[1];
                     var sac2 = move.Arguments[2];
-                    Cells[sac1.X, sac1.Y] = '.';
-                    Cells[sac2.X, sac2.Y] = '.';
+                    Cells[sac1.Y, sac1.X] = '.';
+                    Cells[sac2.Y, sac2.X] = '.';
                     break;
             }
         }
@@ -105,15 +105,15 @@ namespace Yeine.State
             ours = 0;
             theirs = 0;
 
-            for (var x = 0; x < Width; x++)
+            for (var y = 0; y < Height; y++)
             {
-                for (var y = 0; y < Height; y++)
+                for (var x = 0; x < Width; x++)
                 {
-                    if (Cells[x,y] == us)
+                    if (Cells[y,x] == us)
                     {
                         ours++;
                     }
-                    else if (Cells[x,y] == them)
+                    else if (Cells[y,x] == them)
                     {
                         theirs++;
                     }
@@ -136,54 +136,54 @@ namespace Yeine.State
             } 
             
             // pass 1: count neighbours
-            for (var x = 0; x < Width; x++)
+            for (var y = 0; y < Height; y++)
             {
-                for (var y = 0; y < Height; y++)
+                for (var x = 0; x < Width; x++)
                 {
-                    if (Cells[x,y] != '.')
+                    if (Cells[y,x] != '.')
                     {
-                        var p = Cells[x,y] - '0';
+                        var p = Cells[y,x] - '0';
                         var notLeft = x > 0;
                         var notRight = x < Width - 1;
 
-                        if (notLeft) neighbours[p, x-1, y]++;
-                        if (notRight) neighbours[p, x+1, y]++;
+                        if (notLeft) neighbours[p, y, x-1]++;
+                        if (notRight) neighbours[p, y, x+1]++;
 
                         if (y > 0)
                         {
-                            neighbours[p, x, y-1]++;
-                            if (notLeft) neighbours[p, x-1, y-1]++;
-                            if (notRight) neighbours[p, x+1, y-1]++;
+                            neighbours[p, y-1, x]++;
+                            if (notLeft) neighbours[p, y-1, x-1]++;
+                            if (notRight) neighbours[p, y-1, x+1]++;
                         }
 
                         if (y < Height-1)
                         {
-                            neighbours[p, x, y+1]++;
-                            if (notLeft) neighbours[p, x-1, y+1]++;
-                            if (notRight) neighbours[p, x+1, y+1]++;
+                            neighbours[p, y+1, x]++;
+                            if (notLeft) neighbours[p, y+1, x-1]++;
+                            if (notRight) neighbours[p, y+1, x+1]++;
                         }
                     }
                 }
             }
 
             // pass 2: life and death
-            for (var x = 0; x < Width; x++)
+            for (var y = 0; y < Height; y++)
             {
-                for (var y = 0; y < Height; y++)
+                for (var x = 0; x < Width; x++)
                 {
-                    var totalNeighbours = neighbours[0,x,y] + neighbours[1,x,y];
-                    if (Cells[x,y] == '.')
+                    var totalNeighbours = neighbours[0,y,x] + neighbours[1,y,x];
+                    if (Cells[y,x] == '.')
                     {                        
                         if (totalNeighbours == 3)
                         {
-                            Cells[x,y] = neighbours[0,x,y] > neighbours[1,x,y] ? '0' : '1';
+                            Cells[y,x] = neighbours[0,y,x] > neighbours[1,y,x] ? '0' : '1';
                         }
                     }
                     else // living cell
                     {
                         if (totalNeighbours < 2 || totalNeighbours > 3)
                         {
-                            Cells[x,y] = '.';
+                            Cells[y,x] = '.';
                         }
                     }
                 }
@@ -203,7 +203,7 @@ namespace Yeine.State
                     {
                         builder.Append(",");
                     }
-                    builder.Append(Cells[x,y]);
+                    builder.Append(Cells[y,x]);
                 }
             }
 
