@@ -174,24 +174,21 @@ namespace Yeine.State
                     }
 
                     // pass 2: life and death
-                    for (var y = 0; y < Height; y++)
+                    for (var i = 0; i < length; i++)
                     {
-                        for (var x = 0; x < Width; x++)
-                        {
-                            var totalNeighbours = pNeighbours[y*Width + x] + pNeighbours[length + y*Width + x];
-                            if (pCells[y*Width + x] == '.')
-                            {                        
-                                if (totalNeighbours == 3)
-                                {
-                                    pCells[y*Width + x] = pNeighbours[y*Width + x] > pNeighbours[length + y*Width + x] ? '0' : '1';
-                                }
-                            }
-                            else // living cell
+                        var totalNeighbours = pNeighbours[i] + pNeighbours[length + i];
+                        if (pCells[i] == '.')
+                        {                        
+                            if (totalNeighbours == 3)
                             {
-                                if (totalNeighbours < 2 || totalNeighbours > 3)
-                                {
-                                    pCells[y*Width + x] = '.';
-                                }
+                                pCells[i] = pNeighbours[i] > pNeighbours[length + i] ? '0' : '1';
+                            }
+                        }
+                        else // living cell
+                        {
+                            if (totalNeighbours < 2 || totalNeighbours > 3)
+                            {
+                                pCells[i] = '.';
                             }
                         }
                     }
