@@ -109,17 +109,20 @@ namespace Yeine.State
             ours = 0;
             theirs = 0;
 
-            for (var y = 0; y < Height; y++)
+            unsafe 
             {
-                for (var x = 0; x < Width; x++)
+                fixed (char* pCells = Cells)
                 {
-                    if (Cells[y,x] == us)
+                    for (var i = 0; i < length; i++)
                     {
-                        ours++;
-                    }
-                    else if (Cells[y,x] == them)
-                    {
-                        theirs++;
+                        if (pCells[i] == us)
+                        {
+                            ours++;
+                        }
+                        else if (pCells[i] == them)
+                        {
+                            theirs++;
+                        }
                     }
                 }
             }
