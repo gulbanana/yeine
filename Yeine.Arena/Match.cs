@@ -28,7 +28,7 @@ namespace Yeine.Arena
             this.S1 = new Game { OurName = "player1", OurID = '1', TheirID = '0' };
         }
 
-        public GameResult PlayGame()
+        public MatchResult PlayMatch()
         {
             if (verbosity >= 1) Console.WriteLine($"==== {P0} vs {P1} ====");
             CurrentField.Evaluate('0', '1', out Cells0, out Cells1);
@@ -46,7 +46,7 @@ namespace Yeine.Arena
                 Console.WriteLine($"{result} in {currentRound-1} rounds - player0 {Cells0}, player1 {Cells1}");
             }
 
-            return isDraw ? GameResult.Draw : Cells0 > Cells1 ? GameResult.Player0Win : GameResult.Player1Win;
+            return isDraw ? MatchResult.Draw : Cells0 > Cells1 ? MatchResult.Player0Win : MatchResult.Player1Win;
         }
 
         public TurnResult PlayTurn()

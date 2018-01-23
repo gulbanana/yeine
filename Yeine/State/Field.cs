@@ -206,5 +206,33 @@ namespace Yeine.State
 
             return new string(textCells);
         }
+
+        public static Field Random(int w, int h)
+        {
+            var cells = new char[h,w];
+            for (var y = 0; y < h; y++)
+            {
+                for (var x = 0; x < w; x++)
+                {
+                    cells[y,x] = '.';
+                }
+            }
+
+            var rng = new Random();
+            for (var i = 0; i < 40;)
+            {
+                var x = rng.Next(0, w-1);
+                var y = rng.Next(0, (h/2)-1);
+
+                if (cells[y,x] == '.')
+                {
+                    cells[y,x] = '0';
+                    cells[h-1-y, x] = '1';
+                    i++;
+                }
+            }
+
+            return new Field(w, h, cells, new byte[2, 18, 16]);
+        }
     }
 }
